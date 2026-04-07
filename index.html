@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CS Email Queue</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #F5F3EE;
+    --surface: #FDFCFA;
+    --surface2: #EEECe7;
+    --border: #D8D4CC;
+    --border-light: #E8E5DF;
+    --text: #1A1916;
+    --text-muted: #6B685F;
+    --text-faint: #A09D94;
+    --accent: #2D5A3D;
+    --accent-light: #E8F0EB;
+    --col-todo: #1A3A5C;
+    --col-todo-bg: #EBF0F5;
+    --col-inprog: #5C3A1A;
+    --col-inprog-bg: #F5F0EB;
+    --col-ready: #1A5C2D;
+    --col-ready-bg: #EBF5EE;
+    --high: #7A1F1F;
+    --high-bg: #F5EBEB;
+    --med: #5C3A1A;
+    --med-bg: #F5F0EB;
+    --low: #1A5C2D;
+    --low-bg: #EBF5EE;
+    --radius: 6px;
+    --radius-lg: 10px;
+    --mono: 'DM Mono', monospace;
+    --sans: 'DM Sans', sans-serif;
+    --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-lg: 0 4px 16px rgba(0,0,0,0.10), 0 2px 6px rgba(0,0,0,0.06);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* ── Auth screen ── */
+  #auth-screen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+  }
+
+  .auth-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 2.5rem;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: var(--shadow-lg);
+  }
+
+  .auth-card h1 {
+    font-family: var(--mono);
+    font-size: 20px;
+    font-weight: 500;
+    margin-bottom: 6px;
+    color: var(--text);
+    letter-spacing: -0.02em;
+  }
+
+  .auth-card p {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 1.75rem;
+    line-height: 1.6;
+  }
+
+  .auth-card a { color: var(--accent); }
+
+  .field-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-muted);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  .text-input {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-family: var(--mono);
+    font-size: 13px;
+    background: var(--bg);
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .text-input:focus { border-color: var(--accent); }
+
+  .auth-hint {
+    font-size: 12px;
+    color: var(--text-faint);
+    margin-top: 6px;
+    line-height: 1.5;
+  }
+
+  .btn-primary {
+    width: 100%;
+    margin-top: 1.25rem;
+    padding: 10px;
+    background: var(--text);
+    color: var(--surface);
+    border: none;
+    border-radius: var(--radius);
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    letter-spacing: 0.02em;
+    transition: opacity 0.15s;
+  }
+
+  .btn-primary:hover { opacity: 0.85; }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* ── App shell ── */
+  #app-screen { display: none; min-height: 100vh; }
+
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 1.5rem;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .logo {
+    font-family: var(--mono);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    letter-spacing: -0.02em;
+  }
+
+  .sync-status {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-faint);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .sync-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--text-faint);
+    transition: background 0.3s;
+  }
+
+  .sync-dot.syncing { background: #E8A020; animation: pulse 1s infinite; }
+  .sync-dot.synced { background: #2D8A4E; }
+  .sync-dot.error { background: #CC3333; }
+
+  @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+
+  .header-right { display: flex; align-items: center; gap: 10px; }
+
+  .btn-add {
+    padding: 7px 14px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius);
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    letter-spacing: 0.02em;
+    transition: opacity 0.15s;
+  }
+
+  .btn-add:hover { opacity: 0.85; }
+
+  .btn-ghost {
+    padding: 6px 12px;
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-family: var(--mono);
+    font-size: 11px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .btn-ghost:hover { background: var(--surface2); }
+
+  /* ── Board ── */
+  .board-wrap {
+    padding: 1.5rem;
+    overflow-x: auto;
+  }
+
+  .board {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(260px, 1fr));
+    gap: 12px;
+    min-width: 700px;
+  }
+
+  .col {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+
+  .col-head {
+    padding: 12px 14px 10px;
+    border-bottom: 1px solid var(--border-light);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .col-name {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+  }
+
+  .col-todo .col-name { color: var(--col-todo); }
+  .col-inprog .col-name { color: var(--col-inprog); }
+  .col-ready .col-name { color: var(--col-ready); }
+
+  .col-badge {
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-weight: 400;
+  }
+
+  .col-todo .col-badge { background: var(--col-todo-bg); color: var(--col-todo); }
+  .col-inprog .col-badge { background: var(--col-inprog-bg); color: var(--col-inprog); }
+  .col-ready .col-badge { background: var(--col-ready-bg); color: var(--col-ready); }
+
+  .col-cards { padding: 10px; min-height: 120px; }
+
+  .empty {
+    text-align: center;
+    padding: 2rem 1rem;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-faint);
+  }
+
+  /* ── Card ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius);
+    padding: 12px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: border-color 0.15s, box-shadow 0.15s, transform 0.1s;
+    box-shadow: var(--shadow);
+  }
+
+  .card:hover {
+    border-color: var(--border);
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-1px);
+  }
+
+  .card:last-child { margin-bottom: 0; }
+
+  .card-subject {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 4px;
+    line-height: 1.4;
+  }
+
+  .card-from {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .card-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .pill {
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+
+  .pill-high { background: var(--high-bg); color: var(--high); }
+  .pill-med { background: var(--med-bg); color: var(--med); }
+  .pill-low { background: var(--low-bg); color: var(--low); }
+
+  .card-indicators {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .indicator {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-faint);
+  }
+
+  .indicator.active { color: var(--accent); }
+
+  /* ── Modal ── */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(20,18,14,0.45);
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    z-index: 100;
+    padding: 2rem 1rem;
+    overflow-y: auto;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+
+  .modal-overlay.open {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    width: 100%;
+    max-width: 560px;
+    box-shadow: var(--shadow-lg);
+    transform: translateY(12px);
+    transition: transform 0.2s;
+    margin: auto;
+  }
+
+  .modal-overlay.open .modal { transform: translateY(0); }
+
+  .modal-head {
+    padding: 1.25rem 1.5rem 1rem;
+    border-bottom: 1px solid var(--border-light);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .modal-head h2 {
+    font-family: var(--mono);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    letter-spacing: -0.01em;
+  }
+
+  .btn-close {
+    width: 28px; height: 28px;
+    display: flex; align-items: center; justify-content: center;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: transparent;
+    cursor: pointer;
+    color: var(--text-muted);
+    font-size: 16px;
+    line-height: 1;
+    transition: background 0.15s;
+  }
+
+  .btn-close:hover { background: var(--surface2); }
+
+  .modal-body { padding: 1.25rem 1.5rem; }
+
+  .field { margin-bottom: 14px; }
+
+  .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  select.text-input { cursor: pointer; }
+
+  textarea.text-input {
+    resize: vertical;
+    min-height: 90px;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border-light);
+    margin-bottom: 14px;
+    gap: 0;
+  }
+
+  .tab-btn {
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 8px 14px;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: color 0.15s, border-color 0.15s;
+  }
+
+  .tab-btn.active {
+    color: var(--text);
+    border-bottom-color: var(--accent);
+  }
+
+  .tab-btn:hover:not(.active) { color: var(--text); }
+
+  .tab-pane { display: none; }
+  .tab-pane.active { display: block; }
+
+  .modal-foot {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--border-light);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .move-section {
+    flex: 1;
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .btn-move {
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 5px 10px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+  }
+
+  .btn-move:hover { background: var(--surface2); border-color: var(--border); color: var(--text); }
+
+  .btn-save {
+    padding: 8px 18px;
+    background: var(--text);
+    color: var(--surface);
+    border: none;
+    border-radius: var(--radius);
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+
+  .btn-save:hover { opacity: 0.82; }
+
+  .btn-delete {
+    padding: 8px 14px;
+    background: transparent;
+    color: var(--high);
+    border: 1px solid #E8C4C4;
+    border-radius: var(--radius);
+    font-family: var(--mono);
+    font-size: 12px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .btn-delete:hover { background: var(--high-bg); }
+
+  /* ── Toast ── */
+  .toast {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    background: var(--text);
+    color: var(--surface);
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 10px 16px;
+    border-radius: var(--radius);
+    z-index: 200;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.2s, transform 0.2s;
+    pointer-events: none;
+  }
+
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  /* ── Error ── */
+  .error-msg {
+    margin-top: 10px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--high);
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<!-- AUTH SCREEN -->
+<div id="auth-screen">
+  <div class="auth-card">
+    <h1>cs_email_queue</h1>
+    <p>Enter your GitHub Personal Access Token to get started. Your data is stored in a private Gist on your GitHub account and syncs across devices.</p>
+    <div class="field">
+      <label class="field-label">GitHub Token</label>
+      <input type="password" class="text-input" id="token-input" placeholder="ghp_xxxxxxxxxxxx" />
+      <p class="auth-hint">
+        Needs <strong>gist</strong> scope only. Create one at
+        <a href="https://github.com/settings/tokens/new?scopes=gist&description=CS+Email+Queue" target="_blank">github.com/settings/tokens</a>.
+      </p>
+      <p class="error-msg" id="auth-error">Could not authenticate. Check your token and try again.</p>
+    </div>
+    <button class="btn-primary" id="connect-btn" onclick="connect()">Connect to GitHub</button>
+  </div>
+</div>
+
+<!-- APP SCREEN -->
+<div id="app-screen">
+  <header>
+    <div class="header-left">
+      <span class="logo">cs_email_queue</span>
+      <span class="sync-status">
+        <span class="sync-dot" id="sync-dot"></span>
+        <span id="sync-label">—</span>
+      </span>
+    </div>
+    <div class="header-right">
+      <button class="btn-ghost" onclick="logout()">sign out</button>
+      <button class="btn-add" onclick="openNew()">+ add email</button>
+    </div>
+  </header>
+
+  <div class="board-wrap">
+    <div class="board">
+      <div class="col col-todo" id="col-todo">
+        <div class="col-head">
+          <span class="col-name">To research</span>
+          <span class="col-badge" id="count-todo">0</span>
+        </div>
+        <div class="col-cards" id="cards-todo"></div>
+      </div>
+      <div class="col col-inprog" id="col-inprog">
+        <div class="col-head">
+          <span class="col-name">In progress</span>
+          <span class="col-badge" id="count-inprog">0</span>
+        </div>
+        <div class="col-cards" id="cards-inprog"></div>
+      </div>
+      <div class="col col-ready" id="col-ready">
+        <div class="col-head">
+          <span class="col-name">Ready to reply</span>
+          <span class="col-badge" id="count-ready">0</span>
+        </div>
+        <div class="col-cards" id="cards-ready"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="handleOverlayClick(event)">
+  <div class="modal">
+    <div class="modal-head">
+      <h2 id="modal-title">add email</h2>
+      <button class="btn-close" onclick="closeModal()">&#x2715;</button>
+    </div>
+    <div class="modal-body">
+      <div class="field">
+        <label class="field-label">Subject</label>
+        <input type="text" class="text-input" id="f-subject" placeholder="e.g. API integration failing on prod" />
+      </div>
+      <div class="row-2">
+        <div class="field">
+          <label class="field-label">From</label>
+          <input type="text" class="text-input" id="f-from" placeholder="Name or email" />
+        </div>
+        <div class="field">
+          <label class="field-label">Priority</label>
+          <select class="text-input" id="f-priority">
+            <option value="high">High</option>
+            <option value="med" selected>Medium</option>
+            <option value="low">Low</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label class="field-label">Status</label>
+        <select class="text-input" id="f-status">
+          <option value="todo">To research</option>
+          <option value="inprog">In progress</option>
+          <option value="ready">Ready to reply</option>
+        </select>
+      </div>
+
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('notes', this)">Research notes</button>
+        <button class="tab-btn" onclick="switchTab('draft', this)">Draft reply</button>
+      </div>
+
+      <div class="tab-pane active" id="tab-notes">
+        <div class="field">
+          <textarea class="text-input" id="f-notes" placeholder="Paste links, jot findings, track down answers here..."></textarea>
+        </div>
+      </div>
+
+      <div class="tab-pane" id="tab-draft">
+        <div class="field">
+          <textarea class="text-input" id="f-draft" style="min-height:130px;" placeholder="Draft your reply here before sending..."></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <div class="move-section" id="move-section" style="display:none;">
+        <button class="btn-move" onclick="moveCard('todo')">→ To research</button>
+        <button class="btn-move" onclick="moveCard('inprog')">→ In progress</button>
+        <button class="btn-move" onclick="moveCard('ready')">→ Ready to reply</button>
+      </div>
+      <button class="btn-delete" id="btn-delete" style="display:none;" onclick="deleteCard()">delete</button>
+      <button class="btn-save" onclick="saveCard()">save</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const GIST_FILENAME = 'cs_email_queue.json';
+let token = '';
+let gistId = '';
+let cards = [];
+let editingId = null;
+let saveTimer = null;
+
+// ── Storage helpers ──
+function storeToken(t) { try { localStorage.setItem('csq_token', t); } catch(e){} }
+function getStoredToken() { try { return localStorage.getItem('csq_token') || ''; } catch(e){ return ''; } }
+function storeGistId(g) { try { localStorage.setItem('csq_gist', g); } catch(e){} }
+function getStoredGistId() { try { return localStorage.getItem('csq_gist') || ''; } catch(e){ return ''; } }
+
+// ── GitHub API ──
+async function ghFetch(path, opts={}) {
+  const res = await fetch('https://api.github.com' + path, {
+    ...opts,
+    headers: {
+      'Authorization': 'token ' + token,
+      'Accept': 'application/vnd.github.v3+json',
+      'Content-Type': 'application/json',
+      ...(opts.headers||{})
+    }
+  });
+  return res;
+}
+
+async function findOrCreateGist() {
+  if (gistId) return true;
+  // check if stored gist still exists
+  const stored = getStoredGistId();
+  if (stored) {
+    const r = await ghFetch('/gists/' + stored);
+    if (r.ok) { gistId = stored; return true; }
+  }
+  // list gists and look for ours
+  const r = await ghFetch('/gists?per_page=100');
+  if (!r.ok) return false;
+  const gists = await r.json();
+  const found = gists.find(g => g.files && g.files[GIST_FILENAME]);
+  if (found) { gistId = found.id; storeGistId(gistId); return true; }
+  // create new private gist
+  const cr = await ghFetch('/gists', {
+    method: 'POST',
+    body: JSON.stringify({
+      description: 'CS Email Queue data',
+      public: false,
+      files: { [GIST_FILENAME]: { content: JSON.stringify([]) } }
+    })
+  });
+  if (!cr.ok) return false;
+  const ng = await cr.json();
+  gistId = ng.id;
+  storeGistId(gistId);
+  return true;
+}
+
+async function loadFromGist() {
+  setSyncStatus('syncing', 'syncing...');
+  try {
+    const ok = await findOrCreateGist();
+    if (!ok) { setSyncStatus('error', 'error'); return; }
+    const r = await ghFetch('/gists/' + gistId);
+    if (!r.ok) { setSyncStatus('error', 'error'); return; }
+    const data = await r.json();
+    const content = data.files[GIST_FILENAME]?.content || '[]';
+    cards = JSON.parse(content);
+    setSyncStatus('synced', 'synced');
+    render();
+  } catch(e) {
+    setSyncStatus('error', 'error');
+  }
+}
+
+async function saveToGist() {
+  setSyncStatus('syncing', 'saving...');
+  try {
+    const r = await ghFetch('/gists/' + gistId, {
+      method: 'PATCH',
+      body: JSON.stringify({ files: { [GIST_FILENAME]: { content: JSON.stringify(cards, null, 2) } } })
+    });
+    if (r.ok) setSyncStatus('synced', 'saved');
+    else setSyncStatus('error', 'save failed');
+  } catch(e) { setSyncStatus('error', 'save failed'); }
+}
+
+function setSyncStatus(state, label) {
+  const dot = document.getElementById('sync-dot');
+  const lbl = document.getElementById('sync-label');
+  dot.className = 'sync-dot ' + state;
+  lbl.textContent = label;
+}
+
+function scheduleSave() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(saveToGist, 1200);
+}
+
+// ── Auth ──
+async function connect() {
+  const input = document.getElementById('token-input').value.trim();
+  if (!input) return;
+  const btn = document.getElementById('connect-btn');
+  btn.disabled = true;
+  btn.textContent = 'Connecting...';
+  document.getElementById('auth-error').style.display = 'none';
+
+  token = input;
+  const r = await ghFetch('/user');
+  if (!r.ok) {
+    document.getElementById('auth-error').style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Connect to GitHub';
+    token = '';
+    return;
+  }
+  storeToken(token);
+  showApp();
+}
+
+function logout() {
+  try { localStorage.removeItem('csq_token'); localStorage.removeItem('csq_gist'); } catch(e){}
+  token = ''; gistId = ''; cards = [];
+  document.getElementById('app-screen').style.display = 'none';
+  document.getElementById('auth-screen').style.display = 'flex';
+  document.getElementById('token-input').value = '';
+}
+
+function showApp() {
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('app-screen').style.display = 'block';
+  loadFromGist();
+}
+
+// ── Render ──
+function render() {
+  ['todo','inprog','ready'].forEach(status => {
+    const col = document.getElementById('cards-' + status);
+    const colCards = cards.filter(c => c.status === status);
+    document.getElementById('count-' + status).textContent = colCards.length;
+    if (colCards.length === 0) {
+      col.innerHTML = '<div class="empty">— empty —</div>';
+      return;
+    }
+    col.innerHTML = colCards.map(card => {
+      const hasNotes = card.notes && card.notes.trim();
+      const hasDraft = card.draft && card.draft.trim();
+      const pClass = 'pill-' + (card.priority || 'med');
+      const pLabel = card.priority === 'high' ? 'high' : card.priority === 'low' ? 'low' : 'med';
+      return `<div class="card" onclick="openEdit('${card.id}')">
+        <div class="card-subject">${esc(card.subject || '(no subject)')}</div>
+        <div class="card-from">${esc(card.from || '—')}</div>
+        <div class="card-foot">
+          <span class="pill ${pClass}">${pLabel}</span>
+          <div class="card-indicators">
+            ${hasNotes ? '<span class="indicator active" title="Has notes">✎</span>' : ''}
+            ${hasDraft ? '<span class="indicator active" title="Has draft">◈</span>' : ''}
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  });
+}
+
+function esc(s) {
+  return String(s)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;');
+}
+
+// ── Modal ──
+function openNew() {
+  editingId = null;
+  document.getElementById('modal-title').textContent = 'add email';
+  document.getElementById('f-subject').value = '';
+  document.getElementById('f-from').value = '';
+  document.getElementById('f-priority').value = 'med';
+  document.getElementById('f-status').value = 'todo';
+  document.getElementById('f-notes').value = '';
+  document.getElementById('f-draft').value = '';
+  document.getElementById('btn-delete').style.display = 'none';
+  document.getElementById('move-section').style.display = 'none';
+  switchTabByName('notes');
+  openModal();
+}
+
+function openEdit(id) {
+  const card = cards.find(c => c.id === id);
+  if (!card) return;
+  editingId = id;
+  document.getElementById('modal-title').textContent = 'edit email';
+  document.getElementById('f-subject').value = card.subject || '';
+  document.getElementById('f-from').value = card.from || '';
+  document.getElementById('f-priority').value = card.priority || 'med';
+  document.getElementById('f-status').value = card.status || 'todo';
+  document.getElementById('f-notes').value = card.notes || '';
+  document.getElementById('f-draft').value = card.draft || '';
+  document.getElementById('btn-delete').style.display = 'inline-block';
+  document.getElementById('move-section').style.display = 'flex';
+  switchTabByName('notes');
+  openModal();
+}
+
+function openModal() {
+  document.getElementById('modal-overlay').classList.add('open');
+  setTimeout(() => document.getElementById('f-subject').focus(), 100);
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+  editingId = null;
+}
+
+function handleOverlayClick(e) {
+  if (e.target === document.getElementById('modal-overlay')) closeModal();
+}
+
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+}
+
+function switchTabByName(name) {
+  document.querySelectorAll('.tab-btn').forEach((b,i) => {
+    b.classList.toggle('active', (name === 'notes' && i===0) || (name === 'draft' && i===1));
+  });
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+}
+
+function moveCard(status) {
+  document.getElementById('f-status').value = status;
+  saveCard();
+}
+
+function saveCard() {
+  const subject = document.getElementById('f-subject').value.trim();
+  const from = document.getElementById('f-from').value.trim();
+  if (!subject && !from) { document.getElementById('f-subject').focus(); return; }
+  const data = {
+    subject,
+    from,
+    priority: document.getElementById('f-priority').value,
+    status: document.getElementById('f-status').value,
+    notes: document.getElementById('f-notes').value,
+    draft: document.getElementById('f-draft').value,
+  };
+  if (editingId) {
+    const idx = cards.findIndex(c => c.id === editingId);
+    if (idx > -1) cards[idx] = { ...cards[idx], ...data };
+  } else {
+    cards.push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2,7), ...data });
+  }
+  render();
+  closeModal();
+  scheduleSave();
+  showToast(editingId ? 'changes saved' : 'email added');
+}
+
+function deleteCard() {
+  if (!editingId) return;
+  cards = cards.filter(c => c.id !== editingId);
+  render();
+  closeModal();
+  scheduleSave();
+  showToast('card deleted');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ── Boot ──
+(function init() {
+  const stored = getStoredToken();
+  if (stored) { token = stored; showApp(); }
+})();
+</script>
+</body>
+</html>
