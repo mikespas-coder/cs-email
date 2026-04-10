@@ -25,6 +25,8 @@
     --col-inprog-bg: #F5F0EB;
     --col-ready: #1A5C2D;
     --col-ready-bg: #EBF5EE;
+    --col-done: #4A4A48;
+    --col-done-bg: #ECEBE9;
     --high: #7A1F1F;
     --high-bg: #F5EBEB;
     --med: #5C3A1A;
@@ -232,9 +234,9 @@
 
   .board {
     display: grid;
-    grid-template-columns: repeat(3, minmax(260px, 1fr));
+    grid-template-columns: repeat(3, minmax(260px, 1fr)) auto;
     gap: 12px;
-    min-width: 700px;
+    min-width: 900px;
   }
 
   .col {
@@ -242,6 +244,7 @@
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
     overflow: hidden;
+    transition: width 0.3s ease, min-width 0.3s ease;
   }
 
   .col-head {
@@ -258,11 +261,13 @@
     font-weight: 500;
     letter-spacing: 0.07em;
     text-transform: uppercase;
+    white-space: nowrap;
   }
 
   .col-todo .col-name { color: var(--col-todo); }
   .col-inprog .col-name { color: var(--col-inprog); }
   .col-ready .col-name { color: var(--col-ready); }
+  .col-done .col-name { color: var(--col-done); }
 
   .col-badge {
     font-family: var(--mono);
@@ -275,6 +280,7 @@
   .col-todo .col-badge { background: var(--col-todo-bg); color: var(--col-todo); }
   .col-inprog .col-badge { background: var(--col-inprog-bg); color: var(--col-inprog); }
   .col-ready .col-badge { background: var(--col-ready-bg); color: var(--col-ready); }
+  .col-done .col-badge { background: var(--col-done-bg); color: var(--col-done); }
 
   .col-cards { padding: 10px; min-height: 120px; }
 
@@ -284,6 +290,31 @@
     font-family: var(--mono);
     font-size: 12px;
     color: var(--text-faint);
+  }
+
+  /* ── Collapsed State ── */
+  .col.collapsed {
+    min-width: 40px !important;
+    width: 40px !important;
+  }
+  .col.collapsed .col-name, 
+  .col.collapsed .col-badge, 
+  .col.collapsed .col-cards {
+    display: none;
+  }
+  .col.collapsed .col-head {
+    border-bottom: none;
+    padding: 12px 0;
+    justify-content: center;
+  }
+
+  .toggle-btn {
+    cursor: pointer;
+    background: none;
+    border: none;
+    color: var(--text-faint);
+    font-size: 14px;
+    padding: 0 5px;
   }
 
   /* ── Card ── */
@@ -357,7 +388,7 @@
 
   .indicator.active { color: var(--accent); }
   
-  /* NEW CHECKLIST STYLES */
+  /* CHECKLIST STYLES */
   .task-item { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
   .task-text { font-size: 13px; transition: color 0.2s; }
   .task-item input:checked + .task-text { text-decoration: line-through; color: var(--text-faint); }
@@ -598,26 +629,34 @@
 
   <div class="board-wrap">
     <div class="board">
-      <div class="col col-todo" id="col-todo">
+      <div class="col col-todo" id="col-todo" style="min-width:260px;">
         <div class="col-head">
           <span class="col-name">To research</span>
           <span class="col-badge" id="count-todo">0</span>
         </div>
         <div class="col-cards" id="cards-todo"></div>
       </div>
-      <div class="col col-inprog" id="col-inprog">
+      <div class="col col-inprog" id="col-inprog" style="min-width:260px;">
         <div class="col-head">
           <span class="col-name">In progress</span>
           <span class="col-badge" id="count-inprog">0</span>
         </div>
         <div class="col-cards" id="cards-inprog"></div>
       </div>
-      <div class="col col-ready" id="col-ready">
+      <div class="col col-ready" id="col-ready" style="min-width:260px;">
         <div class="col-head">
           <span class="col-name">Ready to reply</span>
           <span class="col-badge" id="count-ready">0</span>
         </div>
         <div class="col-cards" id="cards-ready"></div>
+      </div>
+      <div class="col col-done" id="col-done" style="min-width:260px;">
+        <div class="col-head">
+          <button class="toggle-btn" onclick="toggleColumn()">◂</button>
+          <span class="col-name">Completed</span>
+          <span class="col-badge" id="count-done">0</span>
+        </div>
+        <div class="col-cards" id="cards-done"></div>
       </div>
     </div>
   </div>
@@ -654,6 +693,7 @@
           <option value="todo">To research</option>
           <option value="inprog">In progress</option>
           <option value="ready">Ready to reply</option>
+          <option value="done">Completed</option>
         </select>
       </div>
 
@@ -689,6 +729,7 @@
         <button class="btn-move" onclick="moveCard('todo')">→ To research</button>
         <button class="btn-move" onclick="moveCard('inprog')">→ In progress</button>
         <button class="btn-move" onclick="moveCard('ready')">→ Ready to reply</button>
+        <button class="btn-move" onclick="moveCard('done')">→ Done</button>
       </div>
       <button class="btn-delete" id="btn-delete" style="display:none;" onclick="deleteCard()">delete</button>
       <button class="btn-save" onclick="saveCard()">save</button>
@@ -833,7 +874,7 @@ function showApp() {
 
 // ── Render ──
 function render() {
-  ['todo','inprog','ready'].forEach(status => {
+  ['todo','inprog','ready', 'done'].forEach(status => {
     const col = document.getElementById('cards-' + status);
     const colCards = cards.filter(c => c.status === status);
     document.getElementById('count-' + status).textContent = colCards.length;
@@ -901,6 +942,14 @@ function renderTaskList() {
       <button class="btn-ghost" onclick="deleteTask(${i})" style="margin-left:auto; padding: 2px 6px; font-size: 9px;">&times;</button>
     </div>
   `).join('');
+}
+
+// ── Column Toggle Logic ──
+function toggleColumn() {
+  const col = document.getElementById('col-done');
+  const btn = col.querySelector('.toggle-btn');
+  const isCollapsed = col.classList.toggle('collapsed');
+  btn.textContent = isCollapsed ? '▸' : '◂';
 }
 
 // ── Modal ──
