@@ -25,8 +25,6 @@
     --col-inprog-bg: #F5F0EB;
     --col-ready: #1A5C2D;
     --col-ready-bg: #EBF5EE;
-    --col-done: #4A4A4A;
-    --col-done-bg: #F0F0F0;
     --high: #7A1F1F;
     --high-bg: #F5EBEB;
     --med: #5C3A1A;
@@ -234,14 +232,9 @@
 
   .board {
     display: grid;
-    grid-template-columns: repeat(4, minmax(260px, 1fr));
+    grid-template-columns: repeat(3, minmax(260px, 1fr));
     gap: 12px;
-    min-width: 900px;
-    transition: grid-template-columns 0.3s ease;
-  }
-
-  .board.collapsed-done {
-    grid-template-columns: repeat(3, minmax(260px, 1fr)) 40px;
+    min-width: 700px;
   }
 
   .col {
@@ -249,7 +242,6 @@
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
     overflow: hidden;
-    height: fit-content;
   }
 
   .col-head {
@@ -271,7 +263,6 @@
   .col-todo .col-name { color: var(--col-todo); }
   .col-inprog .col-name { color: var(--col-inprog); }
   .col-ready .col-name { color: var(--col-ready); }
-  .col-done .col-name { color: var(--col-done); }
 
   .col-badge {
     font-family: var(--mono);
@@ -284,22 +275,6 @@
   .col-todo .col-badge { background: var(--col-todo-bg); color: var(--col-todo); }
   .col-inprog .col-badge { background: var(--col-inprog-bg); color: var(--col-inprog); }
   .col-ready .col-badge { background: var(--col-ready-bg); color: var(--col-ready); }
-  .col-done .col-badge { background: var(--col-done-bg); color: var(--col-done); }
-
-  /* Collapsed styles */
-  .col-done.collapsed { width: 40px; }
-  .col-done.collapsed .col-head { padding: 12px 5px; flex-direction: column; gap: 20px; border-bottom: none; }
-  .col-done.collapsed .col-name { writing-mode: vertical-rl; transform: rotate(180deg); margin: 10px 0; }
-  .col-done.collapsed .col-badge, 
-  .col-done.collapsed .col-cards { display: none; }
-
-  .toggle-btn {
-    cursor: pointer;
-    background: none;
-    border: none;
-    font-size: 12px;
-    color: var(--text-faint);
-  }
 
   .col-cards { padding: 10px; min-height: 120px; }
 
@@ -330,14 +305,6 @@
   }
 
   .card:last-child { margin-bottom: 0; }
-
-  .card-date {
-    font-family: var(--mono);
-    font-size: 9px;
-    color: var(--text-faint);
-    margin-bottom: 4px;
-    display: block;
-  }
 
   .card-subject {
     font-size: 13px;
@@ -389,6 +356,12 @@
   }
 
   .indicator.active { color: var(--accent); }
+  
+  /* NEW CHECKLIST STYLES */
+  .task-item { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .task-text { font-size: 13px; transition: color 0.2s; }
+  .task-item input:checked + .task-text { text-decoration: line-through; color: var(--text-faint); }
+  .task-input-row { display: flex; gap: 8px; margin-bottom: 12px; }
 
   /* ── Modal ── */
   .modal-overlay {
@@ -624,7 +597,7 @@
   </header>
 
   <div class="board-wrap">
-    <div class="board" id="main-board">
+    <div class="board">
       <div class="col col-todo" id="col-todo">
         <div class="col-head">
           <span class="col-name">To research</span>
@@ -645,14 +618,6 @@
           <span class="col-badge" id="count-ready">0</span>
         </div>
         <div class="col-cards" id="cards-ready"></div>
-      </div>
-      <div class="col col-done" id="col-done">
-        <div class="col-head">
-          <button class="toggle-btn" onclick="toggleDone()" title="Fold/Unfold Completed">◂</button>
-          <span class="col-name">Completed</span>
-          <span class="col-badge" id="count-done">0</span>
-        </div>
-        <div class="col-cards" id="cards-done"></div>
       </div>
     </div>
   </div>
@@ -689,13 +654,13 @@
           <option value="todo">To research</option>
           <option value="inprog">In progress</option>
           <option value="ready">Ready to reply</option>
-          <option value="done">Completed</option>
         </select>
       </div>
 
       <div class="tabs">
         <button class="tab-btn active" onclick="switchTab('notes', this)">Research notes</button>
         <button class="tab-btn" onclick="switchTab('draft', this)">Draft reply</button>
+        <button class="tab-btn" onclick="switchTab('tasks', this)">Checklist</button>
       </div>
 
       <div class="tab-pane active" id="tab-notes">
@@ -709,13 +674,21 @@
           <textarea class="text-input" id="f-draft" style="min-height:130px;" placeholder="Draft your reply here before sending..."></textarea>
         </div>
       </div>
+
+      <div class="tab-pane" id="tab-tasks">
+        <div class="task-input-row">
+          <input type="text" id="new-task-input" class="text-input" placeholder="Add a sub-task..." onkeypress="if(event.key==='Enter') addTask()">
+          <button class="btn-ghost" onclick="addTask()" style="white-space:nowrap;">Add</button>
+        </div>
+        <div id="task-list-container"></div>
+      </div>
+
     </div>
     <div class="modal-foot">
       <div class="move-section" id="move-section" style="display:none;">
-        <button class="btn-move" onclick="moveCard('todo')">→ Research</button>
-        <button class="btn-move" onclick="moveCard('inprog')">→ Progress</button>
-        <button class="btn-move" onclick="moveCard('ready')">→ Ready</button>
-        <button class="btn-move" onclick="moveCard('done')">→ Done</button>
+        <button class="btn-move" onclick="moveCard('todo')">→ To research</button>
+        <button class="btn-move" onclick="moveCard('inprog')">→ In progress</button>
+        <button class="btn-move" onclick="moveCard('ready')">→ Ready to reply</button>
       </div>
       <button class="btn-delete" id="btn-delete" style="display:none;" onclick="deleteCard()">delete</button>
       <button class="btn-save" onclick="saveCard()">save</button>
@@ -732,6 +705,7 @@ let gistId = '';
 let cards = [];
 let editingId = null;
 let saveTimer = null;
+let currentTasks = [];
 
 // ── Storage helpers ──
 function storeToken(t) { try { localStorage.setItem('csq_token', t); } catch(e){} }
@@ -859,7 +833,7 @@ function showApp() {
 
 // ── Render ──
 function render() {
-  ['todo','inprog','ready','done'].forEach(status => {
+  ['todo','inprog','ready'].forEach(status => {
     const col = document.getElementById('cards-' + status);
     const colCards = cards.filter(c => c.status === status);
     document.getElementById('count-' + status).textContent = colCards.length;
@@ -870,23 +844,20 @@ function render() {
     col.innerHTML = colCards.map(card => {
       const hasNotes = card.notes && card.notes.trim();
       const hasDraft = card.draft && card.draft.trim();
+      
+      const totalTasks = card.tasks ? card.tasks.length : 0;
+      const doneTasks = card.tasks ? card.tasks.filter(t => t.completed).length : 0;
+      const taskPill = totalTasks > 0 ? `<span class="indicator ${doneTasks === totalTasks ? '' : 'active'}">✓ ${doneTasks}/${totalTasks}</span>` : '';
+
       const pClass = 'pill-' + (card.priority || 'med');
       const pLabel = card.priority === 'high' ? 'high' : card.priority === 'low' ? 'low' : 'med';
-      
-      // Formatting date
-      let dateDisplay = "";
-      if(card.createdAt) {
-        const d = new Date(card.createdAt);
-        dateDisplay = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-      }
-
       return `<div class="card" onclick="openEdit('${card.id}')">
-        <span class="card-date">${dateDisplay}</span>
         <div class="card-subject">${esc(card.subject || '(no subject)')}</div>
         <div class="card-from">${esc(card.from || '—')}</div>
         <div class="card-foot">
           <span class="pill ${pClass}">${pLabel}</span>
           <div class="card-indicators">
+            ${taskPill}
             ${hasNotes ? '<span class="indicator active" title="Has notes">✎</span>' : ''}
             ${hasDraft ? '<span class="indicator active" title="Has draft">◈</span>' : ''}
           </div>
@@ -904,21 +875,38 @@ function esc(s) {
     .replace(/"/g,'&quot;');
 }
 
-// ── UI Logic ──
-function toggleDone() {
-  const col = document.getElementById('col-done');
-  const board = document.getElementById('main-board');
-  const btn = col.querySelector('.toggle-btn');
-  
-  col.classList.toggle('collapsed');
-  board.classList.toggle('collapsed-done');
-  
-  btn.textContent = col.classList.contains('collapsed') ? '▸' : '◂';
+// ── Checklist Logic ──
+function addTask() {
+  const input = document.getElementById('new-task-input');
+  const text = input.value.trim();
+  if (!text) return;
+  currentTasks.push({ text, completed: false });
+  input.value = '';
+  renderTaskList();
+}
+function toggleTask(index) {
+  currentTasks[index].completed = !currentTasks[index].completed;
+  renderTaskList();
+}
+function deleteTask(index) {
+  currentTasks.splice(index, 1);
+  renderTaskList();
+}
+function renderTaskList() {
+  const container = document.getElementById('task-list-container');
+  container.innerHTML = currentTasks.map((t, i) => `
+    <div class="task-item">
+      <input type="checkbox" ${t.completed ? 'checked' : ''} onchange="toggleTask(${i})">
+      <span class="task-text">${esc(t.text)}</span>
+      <button class="btn-ghost" onclick="deleteTask(${i})" style="margin-left:auto; padding: 2px 6px; font-size: 9px;">&times;</button>
+    </div>
+  `).join('');
 }
 
 // ── Modal ──
 function openNew() {
   editingId = null;
+  currentTasks = [];
   document.getElementById('modal-title').textContent = 'add email';
   document.getElementById('f-subject').value = '';
   document.getElementById('f-from').value = '';
@@ -929,6 +917,7 @@ function openNew() {
   document.getElementById('btn-delete').style.display = 'none';
   document.getElementById('move-section').style.display = 'none';
   switchTabByName('notes');
+  renderTaskList();
   openModal();
 }
 
@@ -936,6 +925,7 @@ function openEdit(id) {
   const card = cards.find(c => c.id === id);
   if (!card) return;
   editingId = id;
+  currentTasks = card.tasks || [];
   document.getElementById('modal-title').textContent = 'edit email';
   document.getElementById('f-subject').value = card.subject || '';
   document.getElementById('f-from').value = card.from || '';
@@ -946,6 +936,7 @@ function openEdit(id) {
   document.getElementById('btn-delete').style.display = 'inline-block';
   document.getElementById('move-section').style.display = 'flex';
   switchTabByName('notes');
+  renderTaskList();
   openModal();
 }
 
@@ -972,7 +963,7 @@ function switchTab(name, btn) {
 
 function switchTabByName(name) {
   document.querySelectorAll('.tab-btn').forEach((b,i) => {
-    b.classList.toggle('active', (name === 'notes' && i===0) || (name === 'draft' && i===1));
+    b.classList.toggle('active', (name === 'notes' && i===0) || (name === 'draft' && i===1) || (name === 'tasks' && i===2));
   });
   document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
   document.getElementById('tab-' + name).classList.add('active');
@@ -994,17 +985,13 @@ function saveCard() {
     status: document.getElementById('f-status').value,
     notes: document.getElementById('f-notes').value,
     draft: document.getElementById('f-draft').value,
+    tasks: currentTasks
   };
   if (editingId) {
     const idx = cards.findIndex(c => c.id === editingId);
     if (idx > -1) cards[idx] = { ...cards[idx], ...data };
   } else {
-    // Adding CreatedAt timestamp for new cards
-    cards.push({ 
-      id: Date.now().toString(36) + Math.random().toString(36).slice(2,7), 
-      createdAt: new Date().toISOString(),
-      ...data 
-    });
+    cards.push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2,7), ...data });
   }
   render();
   closeModal();
