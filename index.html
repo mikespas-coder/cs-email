@@ -25,8 +25,6 @@
     --col-inprog-bg: #F5F0EB;
     --col-ready: #1A5C2D;
     --col-ready-bg: #EBF5EE;
-    --col-done: #4A4A48;
-    --col-done-bg: #ECEBE9;
     --high: #7A1F1F;
     --high-bg: #F5EBEB;
     --med: #5C3A1A;
@@ -234,9 +232,9 @@
 
   .board {
     display: grid;
-    grid-template-columns: repeat(3, minmax(260px, 1fr)) auto;
+    grid-template-columns: repeat(3, minmax(260px, 1fr));
     gap: 12px;
-    min-width: 900px;
+    min-width: 700px;
   }
 
   .col {
@@ -244,7 +242,6 @@
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
     overflow: hidden;
-    transition: width 0.3s ease, min-width 0.3s ease;
   }
 
   .col-head {
@@ -261,13 +258,11 @@
     font-weight: 500;
     letter-spacing: 0.07em;
     text-transform: uppercase;
-    white-space: nowrap;
   }
 
   .col-todo .col-name { color: var(--col-todo); }
   .col-inprog .col-name { color: var(--col-inprog); }
   .col-ready .col-name { color: var(--col-ready); }
-  .col-done .col-name { color: var(--col-done); }
 
   .col-badge {
     font-family: var(--mono);
@@ -280,7 +275,6 @@
   .col-todo .col-badge { background: var(--col-todo-bg); color: var(--col-todo); }
   .col-inprog .col-badge { background: var(--col-inprog-bg); color: var(--col-inprog); }
   .col-ready .col-badge { background: var(--col-ready-bg); color: var(--col-ready); }
-  .col-done .col-badge { background: var(--col-done-bg); color: var(--col-done); }
 
   .col-cards { padding: 10px; min-height: 120px; }
 
@@ -290,31 +284,6 @@
     font-family: var(--mono);
     font-size: 12px;
     color: var(--text-faint);
-  }
-
-  /* ── Collapsed State ── */
-  .col.collapsed {
-    min-width: 40px !important;
-    width: 40px !important;
-  }
-  .col.collapsed .col-name, 
-  .col.collapsed .col-badge, 
-  .col.collapsed .col-cards {
-    display: none;
-  }
-  .col.collapsed .col-head {
-    border-bottom: none;
-    padding: 12px 0;
-    justify-content: center;
-  }
-
-  .toggle-btn {
-    cursor: pointer;
-    background: none;
-    border: none;
-    color: var(--text-faint);
-    font-size: 14px;
-    padding: 0 5px;
   }
 
   /* ── Card ── */
@@ -387,14 +356,8 @@
   }
 
   .indicator.active { color: var(--accent); }
-  
-  /* CHECKLIST STYLES */
-  .task-item { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
-  .task-text { font-size: 13px; transition: color 0.2s; }
-  .task-item input:checked + .task-text { text-decoration: line-through; color: var(--text-faint); }
-  .task-input-row { display: flex; gap: 8px; margin-bottom: 12px; }
 
-  /* ── Modal ── */
+  /* ── Modal (UPDATED SIZE) ── */
   .modal-overlay {
     position: fixed;
     inset: 0;
@@ -420,7 +383,7 @@
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
     width: 100%;
-    max-width: 560px;
+    max-width: 900px; /* INCREASED SIZE */
     box-shadow: var(--shadow-lg);
     transform: translateY(12px);
     transition: transform 0.2s;
@@ -470,7 +433,7 @@
 
   textarea.text-input {
     resize: vertical;
-    min-height: 90px;
+    min-height: 250px; /* INCREASED HEIGHT */
     font-size: 13px;
     line-height: 1.6;
   }
@@ -480,6 +443,7 @@
     border-bottom: 1px solid var(--border-light);
     margin-bottom: 14px;
     gap: 0;
+    overflow-x: auto;
   }
 
   .tab-btn {
@@ -493,6 +457,7 @@
     border-bottom: 2px solid transparent;
     margin-bottom: -1px;
     transition: color 0.15s, border-color 0.15s;
+    white-space: nowrap;
   }
 
   .tab-btn.active {
@@ -563,6 +528,24 @@
 
   .btn-delete:hover { background: var(--high-bg); }
 
+  /* ── New Activity Log Styles ── */
+  .activity-list {
+    list-style: none;
+    font-family: var(--mono);
+    font-size: 12px;
+    max-height: 300px;
+    overflow-y: auto;
+  }
+  .activity-item {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border-light);
+    color: var(--text-muted);
+  }
+  .activity-time {
+    color: var(--text-faint);
+    margin-right: 8px;
+  }
+
   /* ── Toast ── */
   .toast {
     position: fixed;
@@ -629,34 +612,26 @@
 
   <div class="board-wrap">
     <div class="board">
-      <div class="col col-todo" id="col-todo" style="min-width:260px;">
+      <div class="col col-todo" id="col-todo">
         <div class="col-head">
           <span class="col-name">To research</span>
           <span class="col-badge" id="count-todo">0</span>
         </div>
         <div class="col-cards" id="cards-todo"></div>
       </div>
-      <div class="col col-inprog" id="col-inprog" style="min-width:260px;">
+      <div class="col col-inprog" id="col-inprog">
         <div class="col-head">
           <span class="col-name">In progress</span>
           <span class="col-badge" id="count-inprog">0</span>
         </div>
         <div class="col-cards" id="cards-inprog"></div>
       </div>
-      <div class="col col-ready" id="col-ready" style="min-width:260px;">
+      <div class="col col-ready" id="col-ready">
         <div class="col-head">
           <span class="col-name">Ready to reply</span>
           <span class="col-badge" id="count-ready">0</span>
         </div>
         <div class="col-cards" id="cards-ready"></div>
-      </div>
-      <div class="col col-done" id="col-done" style="min-width:260px;">
-        <div class="col-head">
-          <button class="toggle-btn" onclick="toggleColumn()">◂</button>
-          <span class="col-name">Completed</span>
-          <span class="col-badge" id="count-done">0</span>
-        </div>
-        <div class="col-cards" id="cards-done"></div>
       </div>
     </div>
   </div>
@@ -693,14 +668,14 @@
           <option value="todo">To research</option>
           <option value="inprog">In progress</option>
           <option value="ready">Ready to reply</option>
-          <option value="done">Completed</option>
         </select>
       </div>
 
       <div class="tabs">
         <button class="tab-btn active" onclick="switchTab('notes', this)">Research notes</button>
         <button class="tab-btn" onclick="switchTab('draft', this)">Draft reply</button>
-        <button class="tab-btn" onclick="switchTab('tasks', this)">Checklist</button>
+        <button class="tab-btn" onclick="switchTab('checklist', this)">Checklist</button>
+        <button class="tab-btn" onclick="switchTab('activity', this)">Update Log</button>
       </div>
 
       <div class="tab-pane active" id="tab-notes">
@@ -715,12 +690,15 @@
         </div>
       </div>
 
-      <div class="tab-pane" id="tab-tasks">
-        <div class="task-input-row">
-          <input type="text" id="new-task-input" class="text-input" placeholder="Add a sub-task..." onkeypress="if(event.key==='Enter') addTask()">
-          <button class="btn-ghost" onclick="addTask()" style="white-space:nowrap;">Add</button>
+      <div class="tab-pane" id="tab-checklist">
+        <div class="field">
+          <textarea class="text-input" id="f-checklist" placeholder="- Item 1&#10;- Item 2..."></textarea>
         </div>
-        <div id="task-list-container"></div>
+      </div>
+
+      <div class="tab-pane" id="tab-activity">
+        <div class="activity-list" id="activity-log-list">
+            </div>
       </div>
 
     </div>
@@ -729,7 +707,6 @@
         <button class="btn-move" onclick="moveCard('todo')">→ To research</button>
         <button class="btn-move" onclick="moveCard('inprog')">→ In progress</button>
         <button class="btn-move" onclick="moveCard('ready')">→ Ready to reply</button>
-        <button class="btn-move" onclick="moveCard('done')">→ Done</button>
       </div>
       <button class="btn-delete" id="btn-delete" style="display:none;" onclick="deleteCard()">delete</button>
       <button class="btn-save" onclick="saveCard()">save</button>
@@ -746,7 +723,6 @@ let gistId = '';
 let cards = [];
 let editingId = null;
 let saveTimer = null;
-let currentTasks = [];
 
 // ── Storage helpers ──
 function storeToken(t) { try { localStorage.setItem('csq_token', t); } catch(e){} }
@@ -770,16 +746,19 @@ async function ghFetch(path, opts={}) {
 
 async function findOrCreateGist() {
   if (gistId) return true;
+  // check if stored gist still exists
   const stored = getStoredGistId();
   if (stored) {
     const r = await ghFetch('/gists/' + stored);
     if (r.ok) { gistId = stored; return true; }
   }
+  // list gists and look for ours
   const r = await ghFetch('/gists?per_page=100');
   if (!r.ok) return false;
   const gists = await r.json();
   const found = gists.find(g => g.files && g.files[GIST_FILENAME]);
   if (found) { gistId = found.id; storeGistId(gistId); return true; }
+  // create new private gist
   const cr = await ghFetch('/gists', {
     method: 'POST',
     body: JSON.stringify({
@@ -874,7 +853,7 @@ function showApp() {
 
 // ── Render ──
 function render() {
-  ['todo','inprog','ready', 'done'].forEach(status => {
+  ['todo','inprog','ready'].forEach(status => {
     const col = document.getElementById('cards-' + status);
     const colCards = cards.filter(c => c.status === status);
     document.getElementById('count-' + status).textContent = colCards.length;
@@ -885,11 +864,6 @@ function render() {
     col.innerHTML = colCards.map(card => {
       const hasNotes = card.notes && card.notes.trim();
       const hasDraft = card.draft && card.draft.trim();
-      
-      const totalTasks = card.tasks ? card.tasks.length : 0;
-      const doneTasks = card.tasks ? card.tasks.filter(t => t.completed).length : 0;
-      const taskPill = totalTasks > 0 ? `<span class="indicator ${doneTasks === totalTasks ? '' : 'active'}">✓ ${doneTasks}/${totalTasks}</span>` : '';
-
       const pClass = 'pill-' + (card.priority || 'med');
       const pLabel = card.priority === 'high' ? 'high' : card.priority === 'low' ? 'low' : 'med';
       return `<div class="card" onclick="openEdit('${card.id}')">
@@ -898,7 +872,6 @@ function render() {
         <div class="card-foot">
           <span class="pill ${pClass}">${pLabel}</span>
           <div class="card-indicators">
-            ${taskPill}
             ${hasNotes ? '<span class="indicator active" title="Has notes">✎</span>' : ''}
             ${hasDraft ? '<span class="indicator active" title="Has draft">◈</span>' : ''}
           </div>
@@ -916,46 +889,9 @@ function esc(s) {
     .replace(/"/g,'&quot;');
 }
 
-// ── Checklist Logic ──
-function addTask() {
-  const input = document.getElementById('new-task-input');
-  const text = input.value.trim();
-  if (!text) return;
-  currentTasks.push({ text, completed: false });
-  input.value = '';
-  renderTaskList();
-}
-function toggleTask(index) {
-  currentTasks[index].completed = !currentTasks[index].completed;
-  renderTaskList();
-}
-function deleteTask(index) {
-  currentTasks.splice(index, 1);
-  renderTaskList();
-}
-function renderTaskList() {
-  const container = document.getElementById('task-list-container');
-  container.innerHTML = currentTasks.map((t, i) => `
-    <div class="task-item">
-      <input type="checkbox" ${t.completed ? 'checked' : ''} onchange="toggleTask(${i})">
-      <span class="task-text">${esc(t.text)}</span>
-      <button class="btn-ghost" onclick="deleteTask(${i})" style="margin-left:auto; padding: 2px 6px; font-size: 9px;">&times;</button>
-    </div>
-  `).join('');
-}
-
-// ── Column Toggle Logic ──
-function toggleColumn() {
-  const col = document.getElementById('col-done');
-  const btn = col.querySelector('.toggle-btn');
-  const isCollapsed = col.classList.toggle('collapsed');
-  btn.textContent = isCollapsed ? '▸' : '◂';
-}
-
 // ── Modal ──
 function openNew() {
   editingId = null;
-  currentTasks = [];
   document.getElementById('modal-title').textContent = 'add email';
   document.getElementById('f-subject').value = '';
   document.getElementById('f-from').value = '';
@@ -963,10 +899,11 @@ function openNew() {
   document.getElementById('f-status').value = 'todo';
   document.getElementById('f-notes').value = '';
   document.getElementById('f-draft').value = '';
+  document.getElementById('f-checklist').value = '';
+  document.getElementById('activity-log-list').innerHTML = '<div class="empty">No history yet.</div>';
   document.getElementById('btn-delete').style.display = 'none';
   document.getElementById('move-section').style.display = 'none';
   switchTabByName('notes');
-  renderTaskList();
   openModal();
 }
 
@@ -974,7 +911,6 @@ function openEdit(id) {
   const card = cards.find(c => c.id === id);
   if (!card) return;
   editingId = id;
-  currentTasks = card.tasks || [];
   document.getElementById('modal-title').textContent = 'edit email';
   document.getElementById('f-subject').value = card.subject || '';
   document.getElementById('f-from').value = card.from || '';
@@ -982,10 +918,24 @@ function openEdit(id) {
   document.getElementById('f-status').value = card.status || 'todo';
   document.getElementById('f-notes').value = card.notes || '';
   document.getElementById('f-draft').value = card.draft || '';
+  document.getElementById('f-checklist').value = card.checklist || '';
+  
+  // Render Activity Log
+  const logList = document.getElementById('activity-log-list');
+  if (card.activity && card.activity.length > 0) {
+      logList.innerHTML = card.activity.slice().reverse().map(entry => `
+          <div class="activity-item">
+              <span class="activity-time">[${entry.time}]</span>
+              <span>${esc(entry.msg)}</span>
+          </div>
+      `).join('');
+  } else {
+      logList.innerHTML = '<div class="empty">No history yet.</div>';
+  }
+
   document.getElementById('btn-delete').style.display = 'inline-block';
   document.getElementById('move-section').style.display = 'flex';
   switchTabByName('notes');
-  renderTaskList();
   openModal();
 }
 
@@ -1012,7 +962,12 @@ function switchTab(name, btn) {
 
 function switchTabByName(name) {
   document.querySelectorAll('.tab-btn').forEach((b,i) => {
-    b.classList.toggle('active', (name === 'notes' && i===0) || (name === 'draft' && i===1) || (name === 'tasks' && i===2));
+    b.classList.toggle('active', 
+        (name === 'notes' && i===0) || 
+        (name === 'draft' && i===1) || 
+        (name === 'checklist' && i===2) || 
+        (name === 'activity' && i===3)
+    );
   });
   document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
   document.getElementById('tab-' + name).classList.add('active');
@@ -1027,6 +982,11 @@ function saveCard() {
   const subject = document.getElementById('f-subject').value.trim();
   const from = document.getElementById('f-from').value.trim();
   if (!subject && !from) { document.getElementById('f-subject').focus(); return; }
+  
+  const now = new Date();
+  const timeStr = now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+  const logEntry = { time: timeStr, msg: "Saved updates" };
+
   const data = {
     subject,
     from,
@@ -1034,13 +994,21 @@ function saveCard() {
     status: document.getElementById('f-status').value,
     notes: document.getElementById('f-notes').value,
     draft: document.getElementById('f-draft').value,
-    tasks: currentTasks
+    checklist: document.getElementById('f-checklist').value,
   };
+
   if (editingId) {
     const idx = cards.findIndex(c => c.id === editingId);
-    if (idx > -1) cards[idx] = { ...cards[idx], ...data };
+    if (idx > -1) {
+        const oldActivity = cards[idx].activity || [];
+        cards[idx] = { ...cards[idx], ...data, activity: [...oldActivity, logEntry] };
+    }
   } else {
-    cards.push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2,7), ...data });
+    cards.push({ 
+        id: Date.now().toString(36) + Math.random().toString(36).slice(2,7), 
+        ...data, 
+        activity: [ { time: timeStr, msg: "Created card" } ] 
+    });
   }
   render();
   closeModal();
