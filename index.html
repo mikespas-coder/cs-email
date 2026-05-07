@@ -9,748 +9,287 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet" />
 <style>
   :root {
-    --bg: #F5F3EE;
-    --surface: #FDFCFA;
-    --surface2: #EEECe7;
-    --border: #D8D4CC;
-    --border-light: #E8E5DF;
-    --text: #1A1916;
-    --text-muted: #6B685F;
-    --text-faint: #A09D94;
-    --accent: #2D5A3D;
-    --accent-light: #E8F0EB;
-    --col-todo: #1A3A5C;
-    --col-todo-bg: #EBF0F5;
-    --col-inprog: #5C3A1A;
-    --col-inprog-bg: #F5F0EB;
-    --col-ready: #1A5C2D;
-    --col-ready-bg: #EBF5EE;
-    --col-done: #4A4A48;
-    --col-done-bg: #ECEBE9;
-    --high: #7A1F1F;
-    --high-bg: #F5EBEB;
-    --med: #5C3A1A;
-    --med-bg: #F5F0EB;
-    --low: #1A5C2D;
-    --low-bg: #EBF5EE;
-    --radius: 6px;
-    --radius-lg: 10px;
-    --mono: 'DM Mono', monospace;
-    --sans: 'DM Sans', sans-serif;
-    --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
-    --shadow-lg: 0 4px 16px rgba(0,0,0,0.10), 0 2px 6px rgba(0,0,0,0.06);
+    --bg:#F5F3EE;--surface:#FDFCFA;--surface2:#EEECe7;--border:#D8D4CC;--border-light:#E8E5DF;
+    --text:#1A1916;--text-muted:#6B685F;--text-faint:#A09D94;--accent:#2D5A3D;
+    --col-todo:#1A3A5C;--col-todo-bg:#EBF0F5;--col-inprog:#5C3A1A;--col-inprog-bg:#F5F0EB;
+    --col-waiting:#6B3A7A;--col-waiting-bg:#F3EEF7;--col-escalated:#7A1F1F;--col-escalated-bg:#F5EBEB;
+    --col-ready:#1A5C2D;--col-ready-bg:#EBF5EE;--col-done:#4A4A48;--col-done-bg:#ECEBE9;
+    --high:#7A1F1F;--high-bg:#F5EBEB;--med:#5C3A1A;--med-bg:#F5F0EB;--low:#1A5C2D;--low-bg:#EBF5EE;
+    --radius:6px;--radius-lg:10px;--mono:'DM Mono',monospace;--sans:'DM Sans',sans-serif;
+    --shadow:0 1px 3px rgba(0,0,0,0.06),0 1px 2px rgba(0,0,0,0.04);
+    --shadow-lg:0 4px 16px rgba(0,0,0,0.10),0 2px 6px rgba(0,0,0,0.06);
   }
-
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: var(--sans);
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    font-size: 14px;
-    line-height: 1.5;
-  }
-
-  /* ── Auth screen ── */
-  #auth-screen {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem;
-  }
-
-  .auth-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    padding: 2.5rem;
-    width: 100%;
-    max-width: 420px;
-    box-shadow: var(--shadow-lg);
-  }
-
-  .auth-card h1 {
-    font-family: var(--mono);
-    font-size: 20px;
-    font-weight: 500;
-    margin-bottom: 6px;
-    color: var(--text);
-    letter-spacing: -0.02em;
-  }
-
-  .auth-card p {
-    font-size: 13px;
-    color: var(--text-muted);
-    margin-bottom: 1.75rem;
-    line-height: 1.6;
-  }
-
-  .auth-card a { color: var(--accent); }
-
-  .field-label {
-    font-family: var(--mono);
-    font-size: 11px;
-    font-weight: 500;
-    color: var(--text-muted);
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    display: block;
-    margin-bottom: 6px;
-  }
-
-  .text-input {
-    width: 100%;
-    padding: 9px 12px;
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    font-family: var(--mono);
-    font-size: 13px;
-    background: var(--bg);
-    color: var(--text);
-    outline: none;
-    transition: border-color 0.15s;
-  }
-
-  .text-input:focus { border-color: var(--accent); }
-
-  .auth-hint {
-    font-size: 12px;
-    color: var(--text-faint);
-    margin-top: 6px;
-    line-height: 1.5;
-  }
-
-  .btn-primary {
-    width: 100%;
-    margin-top: 1.25rem;
-    padding: 10px;
-    background: var(--text);
-    color: var(--surface);
-    border: none;
-    border-radius: var(--radius);
-    font-family: var(--mono);
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    letter-spacing: 0.02em;
-    transition: opacity 0.15s;
-  }
-
-  .btn-primary:hover { opacity: 0.85; }
-  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
-
-  /* ── App shell ── */
-  #app-screen { display: none; min-height: 100vh; }
-
-  header {
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: 0 1.5rem;
-    height: 52px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: sticky;
-    top: 0;
-    z-index: 10;
-  }
-
-  .header-left {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  }
-
-  .logo {
-    font-family: var(--mono);
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--text);
-    letter-spacing: -0.02em;
-  }
-
-  .sync-status {
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--text-faint);
-    display: flex;
-    align-items: center;
-    gap: 5px;
-  }
-
-  .sync-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--text-faint);
-    transition: background 0.3s;
-  }
-
-  .sync-dot.syncing { background: #E8A020; animation: pulse 1s infinite; }
-  .sync-dot.synced { background: #2D8A4E; }
-  .sync-dot.error { background: #CC3333; }
-
-  @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
-
-  .header-right { display: flex; align-items: center; gap: 10px; }
-
-  .btn-add {
-    padding: 7px 14px;
-    background: var(--accent);
-    color: #fff;
-    border: none;
-    border-radius: var(--radius);
-    font-family: var(--mono);
-    font-size: 12px;
-    font-weight: 500;
-    cursor: pointer;
-    letter-spacing: 0.02em;
-    transition: opacity 0.15s;
-  }
-
-  .btn-add:hover { opacity: 0.85; }
-
-  .btn-ghost {
-    padding: 6px 12px;
-    background: transparent;
-    color: var(--text-muted);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    font-family: var(--mono);
-    font-size: 11px;
-    cursor: pointer;
-    transition: background 0.15s;
-  }
-
-  .btn-ghost:hover { background: var(--surface2); }
-
-  /* ── Board ── */
-  .board-wrap {
-    padding: 1.5rem;
-    overflow-x: auto;
-  }
-
-  .board {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(260px, 1fr)) auto;
-    gap: 12px;
-    min-width: 900px;
-  }
-
-  .col {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-    transition: width 0.3s ease, min-width 0.3s ease;
-  }
-
-  .col-head {
-    padding: 12px 14px 10px;
-    border-bottom: 1px solid var(--border-light);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .col-name {
-    font-family: var(--mono);
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 0.07em;
-    text-transform: uppercase;
-    white-space: nowrap;
-  }
-
-  .col-todo .col-name { color: var(--col-todo); }
-  .col-inprog .col-name { color: var(--col-inprog); }
-  .col-ready .col-name { color: var(--col-ready); }
-  .col-done .col-name { color: var(--col-done); }
-
-  .col-badge {
-    font-family: var(--mono);
-    font-size: 11px;
-    padding: 2px 8px;
-    border-radius: 999px;
-    font-weight: 400;
-  }
-
-  .col-todo .col-badge { background: var(--col-todo-bg); color: var(--col-todo); }
-  .col-inprog .col-badge { background: var(--col-inprog-bg); color: var(--col-inprog); }
-  .col-ready .col-badge { background: var(--col-ready-bg); color: var(--col-ready); }
-  .col-done .col-badge { background: var(--col-done-bg); color: var(--col-done); }
-
-  .col-cards { padding: 10px; min-height: 120px; }
-
-  .empty {
-    text-align: center;
-    padding: 2rem 1rem;
-    font-family: var(--mono);
-    font-size: 12px;
-    color: var(--text-faint);
-  }
-
-  /* ── Collapsed State ── */
-  .col.collapsed {
-    min-width: 40px !important;
-    width: 40px !important;
-  }
-  .col.collapsed .col-name, 
-  .col.collapsed .col-badge, 
-  .col.collapsed .col-cards {
-    display: none;
-  }
-  .col.collapsed .col-head {
-    border-bottom: none;
-    padding: 12px 0;
-    justify-content: center;
-  }
-
-  .toggle-btn {
-    cursor: pointer;
-    background: none;
-    border: none;
-    color: var(--text-faint);
-    font-size: 14px;
-    padding: 0 5px;
-  }
-
-  /* ── Card ── */
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border-light);
-    border-radius: var(--radius);
-    padding: 12px;
-    margin-bottom: 8px;
-    cursor: pointer;
-    transition: border-color 0.15s, box-shadow 0.15s, transform 0.1s;
-    box-shadow: var(--shadow);
-  }
-
-  .card:hover {
-    border-color: var(--border);
-    box-shadow: var(--shadow-lg);
-    transform: translateY(-1px);
-  }
-
-  .card:last-child { margin-bottom: 0; }
-
-  .card-subject {
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text);
-    margin-bottom: 4px;
-    line-height: 1.4;
-  }
-
-  .card-from {
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--text-muted);
-    margin-bottom: 10px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .card-foot {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-  }
-
-  .pill {
-    font-family: var(--mono);
-    font-size: 11px;
-    padding: 2px 8px;
-    border-radius: 999px;
-    white-space: nowrap;
-  }
-
-  .pill-high { background: var(--high-bg); color: var(--high); }
-  .pill-med { background: var(--med-bg); color: var(--med); }
-  .pill-low { background: var(--low-bg); color: var(--low); }
-
-  .card-indicators {
-    display: flex;
-    gap: 6px;
-    align-items: center;
-  }
-
-  .indicator {
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--text-faint);
-  }
-
-  .indicator.active { color: var(--accent); }
-  
-  /* CHECKLIST STYLES */
-  .task-item { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
-  .task-text { font-size: 13px; transition: color 0.2s; }
-  .task-item input:checked + .task-text { text-decoration: line-through; color: var(--text-faint); }
-  .task-input-row { display: flex; gap: 8px; margin-bottom: 12px; }
-
-  /* ── Modal (ENLARGED) ── */
-  .modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(20,18,14,0.45);
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    z-index: 100;
-    padding: 2rem 1rem;
-    overflow-y: auto;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.2s;
-  }
-
-  .modal-overlay.open {
-    opacity: 1;
-    pointer-events: all;
-  }
-
-  .modal {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    width: 100%;
-    max-width: 900px; /* ENLARGED */
-    box-shadow: var(--shadow-lg);
-    transform: translateY(12px);
-    transition: transform 0.2s;
-    margin: auto;
-  }
-
-  .modal-overlay.open .modal { transform: translateY(0); }
-
-  .modal-head {
-    padding: 1.25rem 1.5rem 1rem;
-    border-bottom: 1px solid var(--border-light);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .modal-head h2 {
-    font-family: var(--mono);
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--text);
-    letter-spacing: -0.01em;
-  }
-
-  .btn-close {
-    width: 28px; height: 28px;
-    display: flex; align-items: center; justify-content: center;
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    background: transparent;
-    cursor: pointer;
-    color: var(--text-muted);
-    font-size: 16px;
-    line-height: 1;
-    transition: background 0.15s;
-  }
-
-  .btn-close:hover { background: var(--surface2); }
-
-  .modal-body { padding: 1.25rem 1.5rem; }
-
-  .field { margin-bottom: 14px; }
-
-  .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-
-  select.text-input { cursor: pointer; }
-
-  textarea.text-input {
-    resize: vertical;
-    min-height: 250px; /* ENLARGED */
-    font-size: 13px;
-    line-height: 1.6;
-  }
-
-  .tabs {
-    display: flex;
-    border-bottom: 1px solid var(--border-light);
-    margin-bottom: 14px;
-    gap: 0;
-  }
-
-  .tab-btn {
-    font-family: var(--mono);
-    font-size: 12px;
-    padding: 8px 14px;
-    border: none;
-    background: transparent;
-    color: var(--text-muted);
-    cursor: pointer;
-    border-bottom: 2px solid transparent;
-    margin-bottom: -1px;
-    transition: color 0.15s, border-color 0.15s;
-  }
-
-  .tab-btn.active {
-    color: var(--text);
-    border-bottom-color: var(--accent);
-  }
-
-  .tab-btn:hover:not(.active) { color: var(--text); }
-
-  .tab-pane { display: none; }
-  .tab-pane.active { display: block; }
-
-  .modal-foot {
-    padding: 1rem 1.5rem;
-    border-top: 1px solid var(--border-light);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  /* Update Log Styles */
-  .log-list {
-    font-family: var(--mono);
-    font-size: 12px;
-    max-height: 300px;
-    overflow-y: auto;
-    border: 1px solid var(--border-light);
-    padding: 10px;
-    background: var(--bg);
-    border-radius: var(--radius);
-  }
-  .log-entry { margin-bottom: 6px; padding-bottom: 6px; border-bottom: 1px solid var(--border-light); }
-  .log-entry:last-child { border-bottom: none; }
-  .log-ts { color: var(--text-faint); margin-right: 8px; }
-
-  .move-section {
-    flex: 1;
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-  }
-
-  .btn-move {
-    font-family: var(--mono);
-    font-size: 11px;
-    padding: 5px 10px;
-    border-radius: var(--radius);
-    border: 1px solid var(--border);
-    background: var(--bg);
-    color: var(--text-muted);
-    cursor: pointer;
-    transition: background 0.15s, border-color 0.15s;
-  }
-
-  .btn-move:hover { background: var(--surface2); border-color: var(--border); color: var(--text); }
-
-  .btn-save {
-    padding: 8px 18px;
-    background: var(--text);
-    color: var(--surface);
-    border: none;
-    border-radius: var(--radius);
-    font-family: var(--mono);
-    font-size: 12px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: opacity 0.15s;
-  }
-
-  .btn-save:hover { opacity: 0.82; }
-
-  .btn-delete {
-    padding: 8px 14px;
-    background: transparent;
-    color: var(--high);
-    border: 1px solid #E8C4C4;
-    border-radius: var(--radius);
-    font-family: var(--mono);
-    font-size: 12px;
-    cursor: pointer;
-    transition: background 0.15s;
-  }
-
-  .btn-delete:hover { background: var(--high-bg); }
-
-  /* ── Toast ── */
-  .toast {
-    position: fixed;
-    bottom: 1.5rem;
-    right: 1.5rem;
-    background: var(--text);
-    color: var(--surface);
-    font-family: var(--mono);
-    font-size: 12px;
-    padding: 10px 16px;
-    border-radius: var(--radius);
-    z-index: 200;
-    opacity: 0;
-    transform: translateY(8px);
-    transition: opacity 0.2s, transform 0.2s;
-    pointer-events: none;
-  }
-
-  .toast.show { opacity: 1; transform: translateY(0); }
-
-  /* ── Error ── */
-  .error-msg {
-    margin-top: 10px;
-    font-family: var(--mono);
-    font-size: 12px;
-    color: var(--high);
-    display: none;
-  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.5;}
+
+  /* SETUP */
+  #setup-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem;}
+  .setup-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:2.5rem;width:100%;max-width:540px;box-shadow:var(--shadow-lg);}
+  .setup-card h1{font-family:var(--mono);font-size:20px;font-weight:500;margin-bottom:6px;letter-spacing:-0.02em;}
+  .subtitle{font-size:13px;color:var(--text-muted);margin-bottom:2rem;line-height:1.6;}
+  .setup-step{margin-bottom:1.5rem;}
+  .step-num{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--accent);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:6px;display:block;}
+  .step-desc{font-size:13px;color:var(--text-muted);margin-bottom:10px;line-height:1.7;}
+  .step-desc a{color:var(--accent);}
+  .step-desc code{font-family:var(--mono);font-size:11px;background:var(--surface2);padding:2px 5px;border-radius:3px;display:inline-block;margin:2px 0;}
+  .divider{border:none;border-top:1px solid var(--border-light);margin:1.5rem 0;}
+  .field-label{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--text-muted);letter-spacing:0.06em;text-transform:uppercase;display:block;margin-bottom:6px;}
+  .text-input{width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius);font-family:var(--mono);font-size:13px;background:var(--bg);color:var(--text);outline:none;transition:border-color 0.15s;}
+  .text-input:focus{border-color:var(--accent);}
+  input[type="date"].text-input,input[type="datetime-local"].text-input{color-scheme:light;}
+  .btn-primary{width:100%;margin-top:1rem;padding:10px;background:var(--text);color:var(--surface);border:none;border-radius:var(--radius);font-family:var(--mono);font-size:13px;font-weight:500;cursor:pointer;transition:opacity 0.15s;}
+  .btn-primary:hover{opacity:0.85;}
+  .btn-primary:disabled{opacity:0.4;cursor:not-allowed;}
+  .error-msg{margin-top:10px;font-family:var(--mono);font-size:12px;color:var(--high);display:none;}
+
+  /* AUTH */
+  #auth-screen{min-height:100vh;display:none;align-items:center;justify-content:center;padding:2rem;}
+  .auth-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:2.5rem;width:100%;max-width:360px;box-shadow:var(--shadow-lg);text-align:center;}
+  .auth-card h1{font-family:var(--mono);font-size:18px;font-weight:500;margin-bottom:8px;letter-spacing:-0.02em;}
+  .auth-card p{font-size:13px;color:var(--text-muted);margin-bottom:1.75rem;line-height:1.6;}
+  .btn-google{width:100%;padding:10px 16px;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);font-family:var(--sans);font-size:14px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:background 0.15s,box-shadow 0.15s;box-shadow:var(--shadow);}
+  .btn-google:hover{background:var(--surface2);box-shadow:var(--shadow-lg);}
+
+  /* APP */
+  #app-screen{display:none;min-height:100vh;}
+  header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 1.5rem;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;}
+  .header-left{display:flex;align-items:center;gap:16px;}
+  .logo{font-family:var(--mono);font-size:14px;font-weight:500;letter-spacing:-0.02em;}
+  .sync-status{font-family:var(--mono);font-size:11px;color:var(--text-faint);display:flex;align-items:center;gap:5px;}
+  .sync-dot{width:6px;height:6px;border-radius:50%;background:var(--text-faint);transition:background 0.3s;}
+  .sync-dot.syncing{background:#E8A020;animation:pulse 1s infinite;}
+  .sync-dot.synced{background:#2D8A4E;}
+  .sync-dot.error{background:#CC3333;}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+  .header-right{display:flex;align-items:center;gap:10px;}
+  .user-name{font-family:var(--mono);font-size:11px;color:var(--text-faint);}
+  .btn-add{padding:7px 14px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius);font-family:var(--mono);font-size:12px;font-weight:500;cursor:pointer;transition:opacity 0.15s;}
+  .btn-add:hover{opacity:0.85;}
+  .btn-ghost{padding:6px 12px;background:transparent;color:var(--text-muted);border:1px solid var(--border);border-radius:var(--radius);font-family:var(--mono);font-size:11px;cursor:pointer;transition:background 0.15s;}
+  .btn-ghost:hover{background:var(--surface2);}
+
+  /* BOARD */
+  .board-wrap{padding:1.5rem;overflow-x:auto;}
+  .board{display:grid;grid-template-columns:repeat(6,minmax(220px,1fr));gap:12px;min-width:1300px;}
+  .col{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;}
+  .col-head{padding:12px 14px 10px;border-bottom:1px solid var(--border-light);display:flex;align-items:center;justify-content:space-between;gap:6px;}
+  .col-name{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:0.07em;text-transform:uppercase;white-space:nowrap;flex:1;}
+  .col-badge{font-family:var(--mono);font-size:11px;padding:2px 8px;border-radius:999px;flex-shrink:0;}
+  .col-todo .col-name{color:var(--col-todo);} .col-todo .col-badge{background:var(--col-todo-bg);color:var(--col-todo);}
+  .col-inprog .col-name{color:var(--col-inprog);} .col-inprog .col-badge{background:var(--col-inprog-bg);color:var(--col-inprog);}
+  .col-waiting .col-name{color:var(--col-waiting);} .col-waiting .col-badge{background:var(--col-waiting-bg);color:var(--col-waiting);}
+  .col-escalated .col-name{color:var(--col-escalated);} .col-escalated .col-badge{background:var(--col-escalated-bg);color:var(--col-escalated);}
+  .col-ready .col-name{color:var(--col-ready);} .col-ready .col-badge{background:var(--col-ready-bg);color:var(--col-ready);}
+  .col-done .col-name{color:var(--col-done);} .col-done .col-badge{background:var(--col-done-bg);color:var(--col-done);}
+  .col-cards{padding:10px;min-height:120px;}
+  .empty{text-align:center;padding:2rem 1rem;font-family:var(--mono);font-size:12px;color:var(--text-faint);}
+
+  /* CARD */
+  .card{background:var(--surface);border:1px solid var(--border-light);border-radius:var(--radius);padding:12px;margin-bottom:8px;cursor:pointer;transition:border-color 0.15s,box-shadow 0.15s,transform 0.1s;box-shadow:var(--shadow);}
+  .card:hover{border-color:var(--border);box-shadow:var(--shadow-lg);transform:translateY(-1px);}
+  .card:last-child{margin-bottom:0;}
+  .card-subject{font-size:13px;font-weight:500;margin-bottom:3px;line-height:1.4;}
+  .card-from{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .card-ticket{font-family:var(--mono);font-size:10px;color:var(--accent);margin-bottom:6px;}
+  .card-dates{display:flex;flex-direction:column;gap:2px;margin-bottom:8px;}
+  .card-date-row{font-family:var(--mono);font-size:10px;color:var(--text-faint);display:flex;align-items:center;gap:4px;}
+  .card-date-row.overdue{color:var(--high);font-weight:500;}
+  .card-date-row.soon{color:#8a6000;}
+  .date-lbl{opacity:0.7;min-width:16px;}
+  .card-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+  .pill{font-family:var(--mono);font-size:11px;padding:2px 8px;border-radius:999px;white-space:nowrap;}
+  .pill-high{background:var(--high-bg);color:var(--high);}
+  .pill-med{background:var(--med-bg);color:var(--med);}
+  .pill-low{background:var(--low-bg);color:var(--low);}
+  .card-indicators{display:flex;gap:6px;align-items:center;}
+  .indicator{font-family:var(--mono);font-size:10px;color:var(--text-faint);}
+  .indicator.active{color:var(--accent);}
+
+  /* MODAL */
+  .modal-overlay{position:fixed;inset:0;background:rgba(20,18,14,0.45);display:flex;align-items:flex-start;justify-content:center;z-index:100;padding:2rem 1rem;overflow-y:auto;opacity:0;pointer-events:none;transition:opacity 0.2s;}
+  .modal-overlay.open{opacity:1;pointer-events:all;}
+  .modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);width:100%;max-width:780px;box-shadow:var(--shadow-lg);transform:translateY(12px);transition:transform 0.2s;margin:auto;}
+  .modal-overlay.open .modal{transform:translateY(0);}
+  .modal-head{padding:1.25rem 1.5rem 1rem;border-bottom:1px solid var(--border-light);display:flex;align-items:flex-start;justify-content:space-between;gap:12px;}
+  .modal-head-left{display:flex;flex-direction:column;gap:4px;}
+  .modal-head h2{font-family:var(--mono);font-size:14px;font-weight:500;letter-spacing:-0.01em;}
+  .modal-timestamps{font-family:var(--mono);font-size:10px;color:var(--text-faint);display:flex;gap:14px;}
+  .btn-close{width:28px;height:28px;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:var(--radius);background:transparent;cursor:pointer;color:var(--text-muted);font-size:16px;transition:background 0.15s;flex-shrink:0;}
+  .btn-close:hover{background:var(--surface2);}
+  .modal-body{padding:1.25rem 1.5rem;}
+  .field{margin-bottom:14px;}
+  .row-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+  select.text-input{cursor:pointer;}
+  textarea.text-input{resize:vertical;min-height:250px;font-size:13px;line-height:1.6;}
+  .section-label{font-family:var(--mono);font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-faint);margin:16px 0 10px;display:flex;align-items:center;gap:8px;}
+  .section-label::after{content:'';flex:1;height:1px;background:var(--border-light);}
+  .tabs{display:flex;border-bottom:1px solid var(--border-light);margin-bottom:14px;}
+  .tab-btn{font-family:var(--mono);font-size:12px;padding:8px 14px;border:none;background:transparent;color:var(--text-muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:color 0.15s,border-color 0.15s;}
+  .tab-btn.active{color:var(--text);border-bottom-color:var(--accent);}
+  .tab-btn:hover:not(.active){color:var(--text);}
+  .tab-pane{display:none;}
+  .tab-pane.active{display:block;}
+  .task-input-row{display:flex;gap:8px;margin-bottom:12px;}
+  .task-item{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+  .task-text{font-size:13px;flex:1;}
+  .log-list{font-family:var(--mono);font-size:12px;max-height:300px;overflow-y:auto;border:1px solid var(--border-light);padding:10px;background:var(--bg);border-radius:var(--radius);}
+  .log-entry{margin-bottom:6px;padding-bottom:6px;border-bottom:1px solid var(--border-light);}
+  .log-entry:last-child{border-bottom:none;}
+  .log-ts{color:var(--text-faint);margin-right:8px;}
+  .modal-foot{padding:1rem 1.5rem;border-top:1px solid var(--border-light);display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .move-section{flex:1;display:flex;gap:6px;flex-wrap:wrap;}
+  .btn-move{font-family:var(--mono);font-size:11px;padding:5px 10px;border-radius:var(--radius);border:1px solid var(--border);background:var(--bg);color:var(--text-muted);cursor:pointer;transition:background 0.15s;white-space:nowrap;}
+  .btn-move:hover{background:var(--surface2);color:var(--text);}
+  .btn-save{padding:8px 18px;background:var(--text);color:var(--surface);border:none;border-radius:var(--radius);font-family:var(--mono);font-size:12px;font-weight:500;cursor:pointer;transition:opacity 0.15s;}
+  .btn-save:hover{opacity:0.82;}
+  .btn-delete{padding:8px 14px;background:transparent;color:var(--high);border:1px solid #E8C4C4;border-radius:var(--radius);font-family:var(--mono);font-size:12px;cursor:pointer;transition:background 0.15s;}
+  .btn-delete:hover{background:var(--high-bg);}
+  .toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--text);color:var(--surface);font-family:var(--mono);font-size:12px;padding:10px 16px;border-radius:var(--radius);z-index:200;opacity:0;transform:translateY(8px);transition:opacity 0.2s,transform 0.2s;pointer-events:none;}
+  .toast.show{opacity:1;transform:translateY(0);}
 </style>
 </head>
 <body>
 
-<div id="auth-screen">
-  <div class="auth-card">
-    <h1>cs_email_queue</h1>
-    <p>Enter your GitHub Personal Access Token to get started. Your data is stored in a private Gist on your GitHub account and syncs across devices.</p>
-    <div class="field">
-      <label class="field-label">GitHub Token</label>
-      <input type="password" class="text-input" id="token-input" placeholder="ghp_xxxxxxxxxxxx" />
-      <p class="auth-hint">
-        Needs <strong>gist</strong> scope only. Create one at
-        <a href="https://github.com/settings/tokens/new?scopes=gist&description=CS+Email+Queue" target="_blank">github.com/settings/tokens</a>.
-      </p>
-      <p class="error-msg" id="auth-error">Could not authenticate. Check your token and try again.</p>
+<!-- SETUP -->
+<div id="setup-screen">
+  <div class="setup-card">
+    <h1>cs_email_queue &mdash; first-time setup</h1>
+    <p class="subtitle">One-time setup (~5 min). After this you just visit the page and sign in with Google &mdash; no tokens ever again.</p>
+
+    <div class="setup-step">
+      <span class="step-num">Step 1 &mdash; Create a Firebase project</span>
+      <p class="step-desc">Go to <a href="https://console.firebase.google.com" target="_blank">console.firebase.google.com</a> and sign in with your Google account. Click <strong>"Add project"</strong>, name it anything (e.g. <code>cs-email-queue</code>), turn off Google Analytics, then click <strong>"Create project"</strong>.</p>
     </div>
-    <button class="btn-primary" id="connect-btn" onclick="connect()">Connect to GitHub</button>
+
+    <div class="setup-step">
+      <span class="step-num">Step 2 &mdash; Register a web app &amp; get your config</span>
+      <p class="step-desc">Inside your new project, click the <strong>web icon (&lt;/&gt;)</strong> near the top. Give it any nickname and click <strong>"Register app"</strong>. Firebase will show you a code block. You need the values from it &mdash; paste them into the fields below.</p>
+    </div>
+
+    <div class="setup-step">
+      <span class="step-num">Step 3 &mdash; Enable Firestore database</span>
+      <p class="step-desc">In the left sidebar click <strong>Build &rarr; Firestore Database &rarr; Create database</strong>. Choose <strong>production mode</strong>, pick any region, click <strong>Enable</strong>. Then click the <strong>Rules</strong> tab and replace everything with:<br><br>
+      <code>rules_version = '2';</code><br>
+      <code>service cloud.firestore {</code><br>
+      <code>&nbsp;&nbsp;match /databases/{db}/documents {</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;match /{doc=**} {</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;allow read, write: if request.auth != null;</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;}</code><br>
+      <code>&nbsp;&nbsp;}</code><br>
+      <code>}</code><br><br>
+      Click <strong>Publish</strong>.</p>
+    </div>
+
+    <div class="setup-step">
+      <span class="step-num">Step 4 &mdash; Enable Google Sign-In</span>
+      <p class="step-desc">In the left sidebar click <strong>Build &rarr; Authentication &rarr; Get started</strong>. Click <strong>Google</strong> under Sign-in providers, toggle it <strong>On</strong>, add your email as the support email, and click <strong>Save</strong>.</p>
+    </div>
+
+    <div class="setup-step">
+      <span class="step-num">Step 5 &mdash; Add your domain to Authorized Domains</span>
+      <p class="step-desc">Still in Authentication, click the <strong>Settings</strong> tab &rarr; <strong>Authorized domains</strong>. If you're hosting on GitHub Pages your domain will look like <code>yourusername.github.io</code> &mdash; add it here. (localhost is already there for testing.)</p>
+    </div>
+
+    <hr class="divider" />
+    <div class="setup-step">
+      <span class="step-num">Paste your Firebase config values</span>
+      <p class="step-desc">From the code Firebase showed you in Step 2, copy each value below. They are long strings &mdash; just copy everything inside the quotes.</p>
+    </div>
+
+    <div class="field"><label class="field-label">API Key</label><input type="text" class="text-input" id="cfg-apiKey" placeholder="AIzaSy..." /></div>
+    <div class="field"><label class="field-label">Auth Domain</label><input type="text" class="text-input" id="cfg-authDomain" placeholder="your-project.firebaseapp.com" /></div>
+    <div class="field"><label class="field-label">Project ID</label><input type="text" class="text-input" id="cfg-projectId" placeholder="your-project-id" /></div>
+    <div class="field"><label class="field-label">App ID</label><input type="text" class="text-input" id="cfg-appId" placeholder="1:123456789:web:abc123" /></div>
+    <p class="error-msg" id="setup-error">Please fill in all four fields.</p>
+    <button class="btn-primary" onclick="saveConfig()">Save &amp; Continue &rarr;</button>
   </div>
 </div>
 
+<!-- AUTH -->
+<div id="auth-screen">
+  <div class="auth-card">
+    <h1>cs_email_queue</h1>
+    <p>Sign in with your Google account to access your queue.</p>
+    <button class="btn-google" onclick="signInWithGoogle()">
+      <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M16.51 8H8.98v3h4.3c-.18 1-.74 1.48-1.6 2.04v2.01h2.6a7.8 7.8 0 002.38-5.88c0-.57-.05-.66-.15-1.18z"/><path fill="#34A853" d="M8.98 17c2.16 0 3.97-.72 5.3-1.94l-2.6-2a4.8 4.8 0 01-7.18-2.54H1.83v2.07A8 8 0 008.98 17z"/><path fill="#FBBC05" d="M4.5 10.52a4.8 4.8 0 010-3.04V5.41H1.83a8 8 0 000 7.18l2.67-2.07z"/><path fill="#EA4335" d="M8.98 4.18c1.17 0 2.23.4 3.06 1.2l2.3-2.3A8 8 0 001.83 5.4L4.5 7.49a4.77 4.77 0 014.48-3.3z"/></svg>
+      Sign in with Google
+    </button>
+    <p class="error-msg" id="auth-error" style="display:none;margin-top:12px;">Sign-in failed. Please try again.</p>
+    <button class="btn-ghost" onclick="resetConfig()" style="width:100%;margin-top:16px;font-size:11px;">Reset Firebase config</button>
+  </div>
+</div>
+
+<!-- APP -->
 <div id="app-screen">
   <header>
     <div class="header-left">
       <span class="logo">cs_email_queue</span>
-      <span class="sync-status">
-        <span class="sync-dot" id="sync-dot"></span>
-        <span id="sync-label">—</span>
-      </span>
+      <span class="sync-status"><span class="sync-dot" id="sync-dot"></span><span id="sync-label">—</span></span>
     </div>
     <div class="header-right">
-      <button class="btn-ghost" onclick="logout()">sign out</button>
+      <span class="user-name" id="user-name"></span>
+      <button class="btn-ghost" onclick="signOut()">sign out</button>
       <button class="btn-add" onclick="openNew()">+ add email</button>
     </div>
   </header>
-
   <div class="board-wrap">
     <div class="board">
-      <div class="col col-todo" id="col-todo" style="min-width:260px;">
-        <div class="col-head">
-          <span class="col-name">To research</span>
-          <span class="col-badge" id="count-todo">0</span>
-        </div>
-        <div class="col-cards" id="cards-todo"></div>
-      </div>
-      <div class="col col-inprog" id="col-inprog" style="min-width:260px;">
-        <div class="col-head">
-          <span class="col-name">In progress</span>
-          <span class="col-badge" id="count-inprog">0</span>
-        </div>
-        <div class="col-cards" id="cards-inprog"></div>
-      </div>
-      <div class="col col-ready" id="col-ready" style="min-width:260px;">
-        <div class="col-head">
-          <span class="col-name">Ready to reply</span>
-          <span class="col-badge" id="count-ready">0</span>
-        </div>
-        <div class="col-cards" id="cards-ready"></div>
-      </div>
-      <div class="col col-done" id="col-done" style="min-width:260px;">
-        <div class="col-head">
-          <button class="toggle-btn" onclick="toggleColumn()">◂</button>
-          <span class="col-name">Completed</span>
-          <span class="col-badge" id="count-done">0</span>
-        </div>
-        <div class="col-cards" id="cards-done"></div>
-      </div>
+      <div class="col col-todo"><div class="col-head"><span class="col-name">To Research</span><span class="col-badge" id="count-todo">0</span></div><div class="col-cards" id="cards-todo"></div></div>
+      <div class="col col-inprog"><div class="col-head"><span class="col-name">In Progress</span><span class="col-badge" id="count-inprog">0</span></div><div class="col-cards" id="cards-inprog"></div></div>
+      <div class="col col-waiting"><div class="col-head"><span class="col-name">Waiting on Customer</span><span class="col-badge" id="count-waiting">0</span></div><div class="col-cards" id="cards-waiting"></div></div>
+      <div class="col col-escalated"><div class="col-head"><span class="col-name">Escalated</span><span class="col-badge" id="count-escalated">0</span></div><div class="col-cards" id="cards-escalated"></div></div>
+      <div class="col col-ready"><div class="col-head"><span class="col-name">Ready to Reply</span><span class="col-badge" id="count-ready">0</span></div><div class="col-cards" id="cards-ready"></div></div>
+      <div class="col col-done"><div class="col-head"><span class="col-name">Completed</span><span class="col-badge" id="count-done">0</span></div><div class="col-cards" id="cards-done"></div></div>
     </div>
   </div>
 </div>
 
+<!-- MODAL -->
 <div class="modal-overlay" id="modal-overlay" onclick="handleOverlayClick(event)">
   <div class="modal">
     <div class="modal-head">
-      <h2 id="modal-title">add email</h2>
+      <div class="modal-head-left">
+        <h2 id="modal-title">add email</h2>
+        <div class="modal-timestamps" id="modal-timestamps" style="display:none;"><span id="ts-created"></span><span id="ts-updated"></span></div>
+      </div>
       <button class="btn-close" onclick="closeModal()">&#x2715;</button>
     </div>
     <div class="modal-body">
-      <div class="field">
-        <label class="field-label">Subject</label>
-        <input type="text" class="text-input" id="f-subject" placeholder="e.g. API integration failing on prod" />
+      <div class="field"><label class="field-label">Subject</label><input type="text" class="text-input" id="f-subject" placeholder="e.g. API integration failing on prod" /></div>
+      <div class="row-3">
+        <div class="field"><label class="field-label">From</label><input type="text" class="text-input" id="f-from" placeholder="Name or email" /></div>
+        <div class="field"><label class="field-label">Odoo Ticket #</label><input type="text" class="text-input" id="f-ticket" placeholder="e.g. OD-4821" /></div>
+        <div class="field"><label class="field-label">Priority</label><select class="text-input" id="f-priority"><option value="high">High</option><option value="med" selected>Medium</option><option value="low">Low</option></select></div>
       </div>
-      <div class="row-2">
-        <div class="field">
-          <label class="field-label">From</label>
-          <input type="text" class="text-input" id="f-from" placeholder="Name or email" />
-        </div>
-        <div class="field">
-          <label class="field-label">Priority</label>
-          <select class="text-input" id="f-priority">
-            <option value="high">High</option>
-            <option value="med" selected>Medium</option>
-            <option value="low">Low</option>
-          </select>
-        </div>
+      <div class="field"><label class="field-label">Status</label><select class="text-input" id="f-status"><option value="todo">To Research</option><option value="inprog">In Progress</option><option value="waiting">Waiting on Customer</option><option value="escalated">Escalated</option><option value="ready">Ready to Reply</option><option value="done">Completed</option></select></div>
+      <div class="section-label">Dates &amp; Deadlines</div>
+      <div class="row-3">
+        <div class="field"><label class="field-label">Follow-up Deadline</label><input type="date" class="text-input" id="f-followup" /></div>
+        <div class="field"><label class="field-label">Due Date</label><input type="date" class="text-input" id="f-duedate" /></div>
+        <div class="field"><label class="field-label">Meeting Date &amp; Time</label><input type="datetime-local" class="text-input" id="f-meeting" /></div>
       </div>
-      <div class="field">
-        <label class="field-label">Status</label>
-        <select class="text-input" id="f-status">
-          <option value="todo">To research</option>
-          <option value="inprog">In progress</option>
-          <option value="ready">Ready to reply</option>
-          <option value="done">Completed</option>
-        </select>
-      </div>
-
       <div class="tabs">
-        <button class="tab-btn active" onclick="switchTab('notes', this)">Research notes</button>
-        <button class="tab-btn" onclick="switchTab('draft', this)">Draft reply</button>
-        <button class="tab-btn" onclick="switchTab('tasks', this)">Checklist</button>
-        <button class="tab-btn" onclick="switchTab('logs', this)">Update Log</button>
+        <button class="tab-btn active" onclick="switchTab('notes',this)">Research Notes</button>
+        <button class="tab-btn" onclick="switchTab('draft',this)">Draft Reply</button>
+        <button class="tab-btn" onclick="switchTab('tasks',this)">Checklist</button>
+        <button class="tab-btn" onclick="switchTab('logs',this)">Update Log</button>
       </div>
-
-      <div class="tab-pane active" id="tab-notes">
-        <div class="field">
-          <textarea class="text-input" id="f-notes" placeholder="Paste links, jot findings, track down answers here..."></textarea>
-        </div>
-      </div>
-
-      <div class="tab-pane" id="tab-draft">
-        <div class="field">
-          <textarea class="text-input" id="f-draft" placeholder="Draft your reply here before sending..."></textarea>
-        </div>
-      </div>
-
+      <div class="tab-pane active" id="tab-notes"><div class="field"><textarea class="text-input" id="f-notes" placeholder="Paste links, jot findings, track down answers here..."></textarea></div></div>
+      <div class="tab-pane" id="tab-draft"><div class="field"><textarea class="text-input" id="f-draft" placeholder="Draft your reply here before sending..."></textarea></div></div>
       <div class="tab-pane" id="tab-tasks">
-        <div class="task-input-row">
-          <input type="text" id="new-task-input" class="text-input" placeholder="Add a sub-task..." onkeypress="if(event.key==='Enter') addTask()">
-          <button class="btn-ghost" onclick="addTask()" style="white-space:nowrap;">Add</button>
-        </div>
+        <div class="task-input-row"><input type="text" id="new-task-input" class="text-input" placeholder="Add a sub-task or action item..." onkeypress="if(event.key==='Enter')addTask()" /><button class="btn-ghost" onclick="addTask()" style="white-space:nowrap;">Add</button></div>
         <div id="task-list-container"></div>
       </div>
-
-      <div class="tab-pane" id="tab-logs">
-        <div class="log-list" id="update-log-container">
-          <div class="empty">No updates logged yet.</div>
-        </div>
-      </div>
-
+      <div class="tab-pane" id="tab-logs"><div class="log-list" id="update-log-container"><div class="empty">No updates logged yet.</div></div></div>
     </div>
     <div class="modal-foot">
       <div class="move-section" id="move-section" style="display:none;">
-        <button class="btn-move" onclick="moveCard('todo')">→ To research</button>
-        <button class="btn-move" onclick="moveCard('inprog')">→ In progress</button>
-        <button class="btn-move" onclick="moveCard('ready')">→ Ready to reply</button>
+        <button class="btn-move" onclick="moveCard('todo')">→ To Research</button>
+        <button class="btn-move" onclick="moveCard('inprog')">→ In Progress</button>
+        <button class="btn-move" onclick="moveCard('waiting')">→ Waiting</button>
+        <button class="btn-move" onclick="moveCard('escalated')">→ Escalated</button>
+        <button class="btn-move" onclick="moveCard('ready')">→ Ready to Reply</button>
         <button class="btn-move" onclick="moveCard('done')">→ Done</button>
       </div>
       <button class="btn-delete" id="btn-delete" style="display:none;" onclick="deleteCard()">delete</button>
@@ -758,368 +297,221 @@
     </div>
   </div>
 </div>
-
 <div class="toast" id="toast"></div>
 
-<script>
-const GIST_FILENAME = 'cs_email_queue.json';
-let token = '';
-let gistId = '';
-let cards = [];
-let editingId = null;
-let saveTimer = null;
-let currentTasks = [];
-let currentLogs = [];
+<script type="module">
+import{initializeApp}from'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import{getAuth,GoogleAuthProvider,signInWithPopup,onAuthStateChanged,signOut as fbSignOut}from'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+import{getFirestore,collection,doc,setDoc,deleteDoc,onSnapshot,query,orderBy}from'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
-// ── Storage helpers ──
-function storeToken(t) { try { localStorage.setItem('csq_token', t); } catch(e){} }
-function getStoredToken() { try { return localStorage.getItem('csq_token') || ''; } catch(e){ return ''; } }
-function storeGistId(g) { try { localStorage.setItem('csq_gist', g); } catch(e){} }
-function getStoredGistId() { try { return localStorage.getItem('csq_gist') || ''; } catch(e){ return ''; } }
+const CFG_KEY='csq_firebase_config';
+const ALL_STATUSES=['todo','inprog','waiting','escalated','ready','done'];
+const STATUS_LABELS={todo:'To Research',inprog:'In Progress',waiting:'Waiting on Customer',escalated:'Escalated',ready:'Ready to Reply',done:'Completed'};
 
-// ── GitHub API ──
-async function ghFetch(path, opts={}) {
-  const res = await fetch('https://api.github.com' + path, {
-    ...opts,
-    headers: {
-      'Authorization': 'token ' + token,
-      'Accept': 'application/vnd.github.v3+json',
-      'Content-Type': 'application/json',
-      ...(opts.headers||{})
-    }
+let app,auth,db,unsubscribe;
+let cards=[],editingId=null,currentTasks=[],currentLogs=[],currentUser=null;
+
+function show(id){
+  document.getElementById('setup-screen').style.display=id==='setup-screen'?'flex':'none';
+  document.getElementById('auth-screen').style.display=id==='auth-screen'?'flex':'none';
+  document.getElementById('app-screen').style.display=id==='app-screen'?'block':'none';
+}
+
+function loadConfig(){try{return JSON.parse(localStorage.getItem(CFG_KEY));}catch(e){return null;}}
+
+window.saveConfig=function(){
+  const apiKey=document.getElementById('cfg-apiKey').value.trim();
+  const authDomain=document.getElementById('cfg-authDomain').value.trim();
+  const projectId=document.getElementById('cfg-projectId').value.trim();
+  const appId=document.getElementById('cfg-appId').value.trim();
+  if(!apiKey||!authDomain||!projectId||!appId){document.getElementById('setup-error').style.display='block';return;}
+  localStorage.setItem(CFG_KEY,JSON.stringify({apiKey,authDomain,projectId,appId}));
+  initFirebase({apiKey,authDomain,projectId,appId});
+};
+
+window.resetConfig=function(){localStorage.removeItem(CFG_KEY);show('setup-screen');};
+
+function initFirebase(cfg){
+  app=initializeApp(cfg);
+  auth=getAuth(app);
+  db=getFirestore(app);
+  show('auth-screen');
+  onAuthStateChanged(auth,user=>{
+    if(user){currentUser=user;startApp(user);}
+    else{currentUser=null;show('auth-screen');}
   });
-  return res;
 }
 
-async function findOrCreateGist() {
-  if (gistId) return true;
-  const stored = getStoredGistId();
-  if (stored) {
-    const r = await ghFetch('/gists/' + stored);
-    if (r.ok) { gistId = stored; return true; }
-  }
-  const r = await ghFetch('/gists?per_page=100');
-  if (!r.ok) return false;
-  const gists = await r.json();
-  const found = gists.find(g => g.files && g.files[GIST_FILENAME]);
-  if (found) { gistId = found.id; storeGistId(gistId); return true; }
-  const cr = await ghFetch('/gists', {
-    method: 'POST',
-    body: JSON.stringify({
-      description: 'CS Email Queue data',
-      public: false,
-      files: { [GIST_FILENAME]: { content: JSON.stringify([]) } }
-    })
-  });
-  if (!cr.ok) return false;
-  const ng = await cr.json();
-  gistId = ng.id;
-  storeGistId(gistId);
-  return true;
+window.signInWithGoogle=async function(){
+  document.getElementById('auth-error').style.display='none';
+  try{await signInWithPopup(auth,new GoogleAuthProvider());}
+  catch(e){document.getElementById('auth-error').style.display='block';}
+};
+
+window.signOut=async function(){
+  if(unsubscribe)unsubscribe();
+  await fbSignOut(auth);
+  cards=[];render();show('auth-screen');
+};
+
+function startApp(user){
+  document.getElementById('user-name').textContent=user.displayName||user.email;
+  show('app-screen');
+  setSyncStatus('syncing','loading...');
+  const q=query(collection(db,'users',user.uid,'cards'),orderBy('createdAtMs','asc'));
+  unsubscribe=onSnapshot(q,snap=>{
+    cards=snap.docs.map(d=>({id:d.id,...d.data()}));
+    setSyncStatus('synced','live');render();
+  },()=>setSyncStatus('error','error'));
 }
 
-async function loadFromGist() {
-  setSyncStatus('syncing', 'syncing...');
-  try {
-    const ok = await findOrCreateGist();
-    if (!ok) { setSyncStatus('error', 'error'); return; }
-    const r = await ghFetch('/gists/' + gistId);
-    if (!r.ok) { setSyncStatus('error', 'error'); return; }
-    const data = await r.json();
-    const content = data.files[GIST_FILENAME]?.content || '[]';
-    cards = JSON.parse(content);
-    setSyncStatus('synced', 'synced');
-    render();
-  } catch(e) {
-    setSyncStatus('error', 'error');
-  }
+async function persistCard(card){
+  setSyncStatus('syncing','saving...');
+  try{await setDoc(doc(db,'users',currentUser.uid,'cards',card.id),card);setSyncStatus('synced','saved');}
+  catch(e){setSyncStatus('error','save failed');}
+}
+async function removeCard(id){
+  setSyncStatus('syncing','deleting...');
+  try{await deleteDoc(doc(db,'users',currentUser.uid,'cards',id));setSyncStatus('synced','deleted');}
+  catch(e){setSyncStatus('error','delete failed');}
 }
 
-async function saveToGist() {
-  setSyncStatus('syncing', 'saving...');
-  try {
-    const r = await ghFetch('/gists/' + gistId, {
-      method: 'PATCH',
-      body: JSON.stringify({ files: { [GIST_FILENAME]: { content: JSON.stringify(cards, null, 2) } } })
-    });
-    if (r.ok) setSyncStatus('synced', 'saved');
-    else setSyncStatus('error', 'save failed');
-  } catch(e) { setSyncStatus('error', 'save failed'); }
-}
+function setSyncStatus(s,l){document.getElementById('sync-dot').className='sync-dot '+s;document.getElementById('sync-label').textContent=l;}
+function fmtDate(iso){if(!iso)return'';return new Date(iso+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});}
+function fmtDateTime(iso){if(!iso)return'';const d=new Date(iso);return d.toLocaleDateString('en-US',{month:'short',day:'numeric'})+' '+d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});}
+function dateStatus(iso){if(!iso)return'';const t=new Date();t.setHours(0,0,0,0);const diff=Math.floor((new Date(iso+'T12:00:00')-t)/86400000);return diff<0?'overdue':diff<=2?'soon':'';}
+function nowTs(){const d=new Date();return d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})+' '+d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
-function setSyncStatus(state, label) {
-  const dot = document.getElementById('sync-dot');
-  const lbl = document.getElementById('sync-label');
-  dot.className = 'sync-dot ' + state;
-  lbl.textContent = label;
-}
-
-function scheduleSave() {
-  clearTimeout(saveTimer);
-  saveTimer = setTimeout(saveToGist, 1200);
-}
-
-// ── Auth ──
-async function connect() {
-  const input = document.getElementById('token-input').value.trim();
-  if (!input) return;
-  const btn = document.getElementById('connect-btn');
-  btn.disabled = true;
-  btn.textContent = 'Connecting...';
-  document.getElementById('auth-error').style.display = 'none';
-
-  token = input;
-  const r = await ghFetch('/user');
-  if (!r.ok) {
-    document.getElementById('auth-error').style.display = 'block';
-    btn.disabled = false;
-    btn.textContent = 'Connect to GitHub';
-    token = '';
-    return;
-  }
-  storeToken(token);
-  showApp();
-}
-
-function logout() {
-  try { localStorage.removeItem('csq_token'); localStorage.removeItem('csq_gist'); } catch(e){}
-  token = ''; gistId = ''; cards = [];
-  document.getElementById('app-screen').style.display = 'none';
-  document.getElementById('auth-screen').style.display = 'flex';
-  document.getElementById('token-input').value = '';
-}
-
-function showApp() {
-  document.getElementById('auth-screen').style.display = 'none';
-  document.getElementById('app-screen').style.display = 'block';
-  loadFromGist();
-}
-
-// ── Render ──
-function render() {
-  ['todo','inprog','ready', 'done'].forEach(status => {
-    const col = document.getElementById('cards-' + status);
-    const colCards = cards.filter(c => c.status === status);
-    document.getElementById('count-' + status).textContent = colCards.length;
-    if (colCards.length === 0) {
-      col.innerHTML = '<div class="empty">— empty —</div>';
-      return;
-    }
-    col.innerHTML = colCards.map(card => {
-      const hasNotes = card.notes && card.notes.trim();
-      const hasDraft = card.draft && card.draft.trim();
-      
-      const totalTasks = card.tasks ? card.tasks.length : 0;
-      const doneTasks = card.tasks ? card.tasks.filter(t => t.completed).length : 0;
-      const taskPill = totalTasks > 0 ? `<span class="indicator ${doneTasks === totalTasks ? '' : 'active'}">✓ ${doneTasks}/${totalTasks}</span>` : '';
-
-      const pClass = 'pill-' + (card.priority || 'med');
-      const pLabel = card.priority === 'high' ? 'high' : card.priority === 'low' ? 'low' : 'med';
-      return `<div class="card" onclick="openEdit('${card.id}')">
-        <div class="card-subject">${esc(card.subject || '(no subject)')}</div>
-        <div class="card-from">${esc(card.from || '—')}</div>
-        <div class="card-foot">
-          <span class="pill ${pClass}">${pLabel}</span>
-          <div class="card-indicators">
-            ${taskPill}
-            ${hasNotes ? '<span class="indicator active" title="Has notes">✎</span>' : ''}
-            ${hasDraft ? '<span class="indicator active" title="Has draft">◈</span>' : ''}
-          </div>
-        </div>
+function render(){
+  ALL_STATUSES.forEach(status=>{
+    const col=document.getElementById('cards-'+status);
+    const cc=cards.filter(c=>c.status===status);
+    document.getElementById('count-'+status).textContent=cc.length;
+    if(!cc.length){col.innerHTML='<div class="empty">— empty —</div>';return;}
+    col.innerHTML=cc.map(card=>{
+      const hasNotes=card.notes&&card.notes.trim();
+      const hasDraft=card.draft&&card.draft.trim();
+      const total=card.tasks?card.tasks.length:0;
+      const done=card.tasks?card.tasks.filter(t=>t.completed).length:0;
+      const taskPill=total?`<span class="indicator ${done===total?'':'active'}" title="Checklist">✓ ${done}/${total}</span>`:'';
+      const pClass='pill-'+(card.priority||'med');
+      const pLabel={high:'high',med:'med',low:'low'}[card.priority]||'med';
+      let dh='';
+      if(card.followup||card.duedate||card.meeting){
+        dh='<div class="card-dates">';
+        if(card.followup){const s=dateStatus(card.followup);dh+=`<div class="card-date-row ${s}"><span class="date-lbl">↺</span>${fmtDate(card.followup)}</div>`;}
+        if(card.duedate){const s=dateStatus(card.duedate);dh+=`<div class="card-date-row ${s}"><span class="date-lbl">⚑</span>${fmtDate(card.duedate)}</div>`;}
+        if(card.meeting){dh+=`<div class="card-date-row"><span class="date-lbl">☗</span>${fmtDateTime(card.meeting)}</div>`;}
+        dh+='</div>';
+      }
+      const th=card.ticket?`<div class="card-ticket">#${esc(card.ticket)}</div>`:'';
+      return`<div class="card" onclick="openEdit('${card.id}')">
+        <div class="card-subject">${esc(card.subject||'(no subject)')}</div>
+        <div class="card-from">${esc(card.from||'—')}</div>
+        ${th}${dh}
+        <div class="card-foot"><span class="pill ${pClass}">${pLabel}</span>
+        <div class="card-indicators">${taskPill}${hasNotes?'<span class="indicator active" title="Has notes">✎</span>':''}${hasDraft?'<span class="indicator active" title="Has draft">◈</span>':''}</div></div>
       </div>`;
     }).join('');
   });
 }
 
-function esc(s) {
-  return String(s)
-    .replace(/&/g,'&amp;')
-    .replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;')
-    .replace(/"/g,'&quot;');
+window.addTask=function(){const el=document.getElementById('new-task-input');const t=el.value.trim();if(!t)return;currentTasks.push({text:t,completed:false});el.value='';renderTaskList();};
+window.toggleTask=function(i){currentTasks[i].completed=!currentTasks[i].completed;renderTaskList();};
+window.deleteTask=function(i){currentTasks.splice(i,1);renderTaskList();};
+function renderTaskList(){
+  document.getElementById('task-list-container').innerHTML=currentTasks.map((t,i)=>`
+    <div class="task-item"><input type="checkbox" ${t.completed?'checked':''} onchange="toggleTask(${i})">
+    <span class="task-text" style="${t.completed?'text-decoration:line-through;color:var(--text-faint)':''}">${esc(t.text)}</span>
+    <button class="btn-ghost" onclick="deleteTask(${i})" style="margin-left:auto;padding:2px 6px;font-size:10px;">&times;</button></div>`).join('');
 }
 
-// ── Checklist Logic ──
-function addTask() {
-  const input = document.getElementById('new-task-input');
-  const text = input.value.trim();
-  if (!text) return;
-  currentTasks.push({ text, completed: false });
-  input.value = '';
-  renderTaskList();
-}
-function toggleTask(index) {
-  currentTasks[index].completed = !currentTasks[index].completed;
-  renderTaskList();
-}
-function deleteTask(index) {
-  currentTasks.splice(index, 1);
-  renderTaskList();
-}
-function renderTaskList() {
-  const container = document.getElementById('task-list-container');
-  container.innerHTML = currentTasks.map((t, i) => `
-    <div class="task-item">
-      <input type="checkbox" ${t.completed ? 'checked' : ''} onchange="toggleTask(${i})">
-      <span class="task-text">${esc(t.text)}</span>
-      <button class="btn-ghost" onclick="deleteTask(${i})" style="margin-left:auto; padding: 2px 6px; font-size: 9px;">&times;</button>
-    </div>
-  `).join('');
+function renderLogList(){
+  const c=document.getElementById('update-log-container');
+  if(!currentLogs.length){c.innerHTML='<div class="empty">No updates logged yet.</div>';return;}
+  c.innerHTML=currentLogs.slice().reverse().map(l=>`<div class="log-entry"><span class="log-ts">[${l.ts}]</span><span>${esc(l.msg)}</span></div>`).join('');
 }
 
-// ── Update Log Render ──
-function renderLogList() {
-  const container = document.getElementById('update-log-container');
-  if (currentLogs.length === 0) {
-    container.innerHTML = '<div class="empty">No updates logged yet.</div>';
-    return;
-  }
-  container.innerHTML = currentLogs.slice().reverse().map(log => `
-    <div class="log-entry">
-      <span class="log-ts">[${log.ts}]</span>
-      <span>${esc(log.msg)}</span>
-    </div>
-  `).join('');
+window.openNew=function(){
+  editingId=null;currentTasks=[];currentLogs=[];
+  document.getElementById('modal-title').textContent='add email';
+  document.getElementById('modal-timestamps').style.display='none';
+  clearForm();
+  document.getElementById('btn-delete').style.display='none';
+  document.getElementById('move-section').style.display='none';
+  switchTabByName('notes');renderTaskList();renderLogList();openModal();
+};
+
+window.openEdit=function(id){
+  const card=cards.find(c=>c.id===id);if(!card)return;
+  editingId=id;
+  currentTasks=JSON.parse(JSON.stringify(card.tasks||[]));
+  currentLogs=JSON.parse(JSON.stringify(card.logs||[]));
+  document.getElementById('modal-title').textContent='edit email';
+  const tsEl=document.getElementById('modal-timestamps');
+  if(card.createdAt||card.updatedAt){tsEl.style.display='flex';document.getElementById('ts-created').textContent=card.createdAt?'created: '+card.createdAt:'';document.getElementById('ts-updated').textContent=card.updatedAt?'updated: '+card.updatedAt:'';}
+  else tsEl.style.display='none';
+  document.getElementById('f-subject').value=card.subject||'';
+  document.getElementById('f-from').value=card.from||'';
+  document.getElementById('f-ticket').value=card.ticket||'';
+  document.getElementById('f-priority').value=card.priority||'med';
+  document.getElementById('f-status').value=card.status||'todo';
+  document.getElementById('f-followup').value=card.followup||'';
+  document.getElementById('f-duedate').value=card.duedate||'';
+  document.getElementById('f-meeting').value=card.meeting||'';
+  document.getElementById('f-notes').value=card.notes||'';
+  document.getElementById('f-draft').value=card.draft||'';
+  document.getElementById('btn-delete').style.display='inline-block';
+  document.getElementById('move-section').style.display='flex';
+  switchTabByName('notes');renderTaskList();renderLogList();openModal();
+};
+
+function clearForm(){['f-subject','f-from','f-ticket','f-followup','f-duedate','f-meeting','f-notes','f-draft'].forEach(id=>document.getElementById(id).value='');document.getElementById('f-priority').value='med';document.getElementById('f-status').value='todo';}
+function openModal(){document.getElementById('modal-overlay').classList.add('open');setTimeout(()=>document.getElementById('f-subject').focus(),100);}
+window.closeModal=function(){document.getElementById('modal-overlay').classList.remove('open');editingId=null;};
+window.handleOverlayClick=function(e){if(e.target===document.getElementById('modal-overlay'))window.closeModal();};
+
+window.switchTab=function(name,btn){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');document.getElementById('tab-'+name).classList.add('active');
+};
+function switchTabByName(name){
+  const names=['notes','draft','tasks','logs'];
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',names[i]===name));
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
 }
 
-// ── Column Toggle Logic ──
-function toggleColumn() {
-  const col = document.getElementById('col-done');
-  const btn = col.querySelector('.toggle-btn');
-  const isCollapsed = col.classList.toggle('collapsed');
-  btn.textContent = isCollapsed ? '▸' : '◂';
-}
+window.moveCard=function(status){document.getElementById('f-status').value=status;window.saveCard();};
 
-// ── Modal ──
-function openNew() {
-  editingId = null;
-  currentTasks = [];
-  currentLogs = [];
-  document.getElementById('modal-title').textContent = 'add email';
-  document.getElementById('f-subject').value = '';
-  document.getElementById('f-from').value = '';
-  document.getElementById('f-priority').value = 'med';
-  document.getElementById('f-status').value = 'todo';
-  document.getElementById('f-notes').value = '';
-  document.getElementById('f-draft').value = '';
-  document.getElementById('btn-delete').style.display = 'none';
-  document.getElementById('move-section').style.display = 'none';
-  switchTabByName('notes');
-  renderTaskList();
-  renderLogList();
-  openModal();
-}
+window.saveCard=async function(){
+  const subject=document.getElementById('f-subject').value.trim();
+  const from=document.getElementById('f-from').value.trim();
+  if(!subject&&!from){document.getElementById('f-subject').focus();return;}
+  const ts=nowTs();
+  const oldStatus=editingId?(cards.find(c=>c.id===editingId)?.status||''):'';
+  const newStatus=document.getElementById('f-status').value;
+  const logMsg=editingId?(oldStatus!==newStatus?`Moved to "${STATUS_LABELS[newStatus]}"` :'Updated card details'):'Created card';
+  currentLogs.push({ts,msg:logMsg});
+  const data={subject,from,ticket:document.getElementById('f-ticket').value.trim(),priority:document.getElementById('f-priority').value,status:newStatus,followup:document.getElementById('f-followup').value,duedate:document.getElementById('f-duedate').value,meeting:document.getElementById('f-meeting').value,notes:document.getElementById('f-notes').value,draft:document.getElementById('f-draft').value,tasks:currentTasks,logs:currentLogs,updatedAt:ts,updatedAtMs:Date.now()};
+  let cardToSave;
+  if(editingId){const ex=cards.find(c=>c.id===editingId)||{};cardToSave={...ex,...data};}
+  else{cardToSave={id:Date.now().toString(36)+Math.random().toString(36).slice(2,7),createdAt:ts,createdAtMs:Date.now(),...data};}
+  window.closeModal();showToast(editingId?'changes saved':'email added');
+  await persistCard(cardToSave);
+};
 
-function openEdit(id) {
-  const card = cards.find(c => c.id === id);
-  if (!card) return;
-  editingId = id;
-  currentTasks = card.tasks || [];
-  currentLogs = card.logs || [];
-  document.getElementById('modal-title').textContent = 'edit email';
-  document.getElementById('f-subject').value = card.subject || '';
-  document.getElementById('f-from').value = card.from || '';
-  document.getElementById('f-priority').value = card.priority || 'med';
-  document.getElementById('f-status').value = card.status || 'todo';
-  document.getElementById('f-notes').value = card.notes || '';
-  document.getElementById('f-draft').value = card.draft || '';
-  document.getElementById('btn-delete').style.display = 'inline-block';
-  document.getElementById('move-section').style.display = 'flex';
-  switchTabByName('notes');
-  renderTaskList();
-  renderLogList();
-  openModal();
-}
+window.deleteCard=async function(){
+  if(!editingId)return;const id=editingId;window.closeModal();showToast('card deleted');await removeCard(id);
+};
 
-function openModal() {
-  document.getElementById('modal-overlay').classList.add('open');
-  setTimeout(() => document.getElementById('f-subject').focus(), 100);
-}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
 
-function closeModal() {
-  document.getElementById('modal-overlay').classList.remove('open');
-  editingId = null;
-}
-
-function handleOverlayClick(e) {
-  if (e.target === document.getElementById('modal-overlay')) closeModal();
-}
-
-function switchTab(name, btn) {
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
-  btn.classList.add('active');
-  document.getElementById('tab-' + name).classList.add('active');
-}
-
-function switchTabByName(name) {
-  document.querySelectorAll('.tab-btn').forEach((b,i) => {
-    b.classList.toggle('active', (name === 'notes' && i===0) || (name === 'draft' && i===1) || (name === 'tasks' && i===2) || (name === 'logs' && i===3));
-  });
-  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
-  document.getElementById('tab-' + name).classList.add('active');
-}
-
-function moveCard(status) {
-  document.getElementById('f-status').value = status;
-  saveCard();
-}
-
-function saveCard() {
-  const subject = document.getElementById('f-subject').value.trim();
-  const from = document.getElementById('f-from').value.trim();
-  if (!subject && !from) { document.getElementById('f-subject').focus(); return; }
-
-  // Create Log Entry
-  const now = new Date();
-  const ts = now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-  const newLog = { ts, msg: editingId ? "Updated card details" : "Created card" };
-  currentLogs.push(newLog);
-
-  const data = {
-    subject,
-    from,
-    priority: document.getElementById('f-priority').value,
-    status: document.getElementById('f-status').value,
-    notes: document.getElementById('f-notes').value,
-    draft: document.getElementById('f-draft').value,
-    tasks: currentTasks,
-    logs: currentLogs
-  };
-
-  if (editingId) {
-    const idx = cards.findIndex(c => c.id === editingId);
-    if (idx > -1) cards[idx] = { ...cards[idx], ...data };
-  } else {
-    cards.push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2,7), ...data });
-  }
-  render();
-  closeModal();
-  scheduleSave();
-  showToast(editingId ? 'changes saved' : 'email added');
-}
-
-function deleteCard() {
-  if (!editingId) return;
-  cards = cards.filter(c => c.id !== editingId);
-  render();
-  closeModal();
-  scheduleSave();
-  showToast('card deleted');
-}
-
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2200);
-}
-
-// ── Boot ──
-(function init() {
-  const stored = getStoredToken();
-  if (stored) { token = stored; showApp(); }
-})();
+const cfg=loadConfig();
+if(cfg)initFirebase(cfg);
+else show('setup-screen');
 </script>
 </body>
 </html>
